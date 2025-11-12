@@ -1,9 +1,15 @@
 package blog.users.model;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "users")
 public class UserModel {
     private long id;
     private String username;
     private String password;
+    private String role;
 
     // Default constructor
     public UserModel() {
@@ -43,5 +49,15 @@ public class UserModel {
     // Setter for password
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    // Getter for role
+    public String getRole() {
+        return role;
+    }
+
+    // Setter for role
+    public void setRole(String role) {
+        this.role = role;
     }
 }
