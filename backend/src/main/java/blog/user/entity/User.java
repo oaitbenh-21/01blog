@@ -35,7 +35,7 @@ public class User {
     private String email;
 
     @NotBlank(message = "Password is required")
-    @Column(nullable = false)
+    @Column(nullable = false, length = 50)
     private String password;
 
     @Enumerated(EnumType.STRING)
@@ -49,21 +49,4 @@ public class User {
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
-
-    // ------------------------------
-    // Relations (future extensions)
-    // ------------------------------
-
-    // Example (uncomment when creating Post entity)
-    // @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval =
-    // true)
-    // private List<Post> posts;
-
-    // Followers
-    // @OneToMany(mappedBy = "following")
-    // private Set<Follow> followers;
-
-    // Following
-    // @OneToMany(mappedBy = "follower")
-    // private Set<Follow> following;
 }

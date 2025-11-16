@@ -2,5 +2,6 @@ package blog.user.enums;
 
 public enum Role {
     USER,
-    ADMIN
+    ADMIN,
+    BANNED
 }
