@@ -1,11 +1,14 @@
 package blog.user.service;
 
+import blog.security.JwtService;
+import blog.user.dto.JwtResponse;
 import blog.user.dto.RegisterRequest;
 import blog.user.dto.UserDto;
 import blog.user.entity.User;
 import blog.user.enums.Role;
 import blog.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -15,10 +18,18 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
     /**
      * Register a new user
      */
+    public UserDto login(RegisterRequest request) {
+        User user = userRepository.findByUsername(request.getUsername())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        String jwt = jwtService.generateToken(user.getUsername());
+        return JwtResponse.builder().setJwtToken(jwt);;
+    }
+
     public UserDto register(RegisterRequest request) {
 
         if (userRepository.existsByEmail(request.getEmail())) {
