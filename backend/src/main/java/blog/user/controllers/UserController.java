@@ -35,8 +35,7 @@ public class UserController {
     public ResponseEntity<UserDto> updateUser(
             @PathVariable Long id,
             @RequestParam(required = false) String bio,
-            @RequestParam(required = false) String avatarUrl
-    ) {
+            @RequestParam(required = false) String avatarUrl) {
         return ResponseEntity.ok(userService.updateUser(id, bio, avatarUrl));
     }
 }
