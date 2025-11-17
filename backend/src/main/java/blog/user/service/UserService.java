@@ -1,8 +1,9 @@
 package blog.user.service;
 
 import blog.security.JwtService;
-import blog.user.dto.JwtResponse;
+import blog.user.dto.LoginRequest;
 import blog.user.dto.RegisterRequest;
+import blog.user.dto.SignResponse;
 import blog.user.dto.UserDto;
 import blog.user.entity.User;
 import blog.user.enums.Role;
@@ -20,26 +21,29 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
-    /**
-     * Register a new user
-     */
-    public UserDto login(RegisterRequest request) {
-        User user = userRepository.findByUsername(request.getUsername())
-                .orElseThrow(() -> new RuntimeException("User not found"));
-        String jwt = jwtService.generateToken(user.getUsername());
-        return JwtResponse.builder().setJwtToken(jwt);;
+    public SignResponse login(LoginRequest request) {
+        SignResponse response = userRepository.findByUsername(request.getUsername())
+                .map(user -> {
+                    String jwt = jwtService.generateToken(user.getUsername());
+                    return SignResponse.builder()
+                            .JwtToken(jwt)
+                            .StatusCode(200)
+                            .build();
+                })
+                .orElseGet(() -> SignResponse.builder()
+                        .Error("invalid credential")
+                        .StatusCode(401)
+                        .build());
+        return response;
     }
 
-    public UserDto register(RegisterRequest request) {
-
+    public SignResponse register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Email is already in use");
+            return SignResponse.builder().Error("Email is already taken").StatusCode(422).build();
         }
-
         if (userRepository.existsByUsername(request.getUsername())) {
-            throw new RuntimeException("Username is already taken");
+            return SignResponse.builder().Error("Username is already taken").StatusCode(422).build();
         }
-
         User user = User.builder()
                 .username(request.getUsername())
                 .email(request.getEmail())
@@ -48,8 +52,11 @@ public class UserService {
                 .build();
 
         User saved = userRepository.save(user);
-
-        return toDto(saved);
+        String jwt = jwtService.generateToken(saved.getUsername());
+        return SignResponse.builder()
+                .JwtToken(jwt)
+                .StatusCode(200)
+                .build();
     }
 
     public UserDto getUser(Long id) {
