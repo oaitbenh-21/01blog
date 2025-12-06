@@ -12,7 +12,7 @@ import blog.user.dto.ProfileCard;
 
 @RestController
 @RequestMapping("/api/user/")
-public class Controller {
+public class UserController {
     @GetMapping("/{uuid}")
     public ProfileCard profile(@PathVariable UUID uuid) {
         // call the user Service and get userProfile with data like
@@ -21,6 +21,8 @@ public class Controller {
         // is the user get himself's profile page
         return new ProfileCard();
     }
+
+    
 
     @GetMapping("/hotest")
     public Hotest hostest() {

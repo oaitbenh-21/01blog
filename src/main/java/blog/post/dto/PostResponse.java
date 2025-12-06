@@ -26,12 +26,10 @@ public class PostResponse {
     public PostResponse(PostEntity post) {
         this.id = post.getId();
         this.content = post.getContent();
-        this.likes = post.getLikes();
         this.comments = post.getComments();
         if (post.getAuthor() != null) {
             this.author = new AuthorResponse(post.getAuthor());
         }
-
     }
 
 }
