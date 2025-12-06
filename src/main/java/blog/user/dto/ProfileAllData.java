@@ -1,6 +1,9 @@
 package blog.user.dto;
 
 
+import java.util.List;
+
+import blog.post.dto.PostResponse;
 import blog.user.jpa.UserEntity;
 import lombok.Data;
 
@@ -12,6 +15,7 @@ public class ProfileAllData {
     private String fullname;
     private Long followers;
     private Long following;
+    private List<PostResponse> posts;
 
     public static ProfileAllData fromEntity(UserEntity entity) {
         ProfileAllData profile = new ProfileAllData();

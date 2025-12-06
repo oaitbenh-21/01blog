@@ -13,6 +13,9 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import blog.like.jpa.PostLikeEntity;
 import blog.post.jpa.PostEntity;
 import blog.user.jpa.utils.Role;
 import jakarta.persistence.Column;
@@ -51,6 +54,8 @@ public class UserEntity implements UserDetails, Principal {
     private Long followers;
     private Long following;
     private Role role;
+    @OneToMany(fetch = FetchType.LAZY)
+    private List<PostLikeEntity> liked;
     @CreatedDate
     @Column(nullable = false, updatable = false)
     private LocalDateTime creationTime;
@@ -58,6 +63,7 @@ public class UserEntity implements UserDetails, Principal {
     @Column(insertable = false)
     private LocalDateTime lastUpdateTime;
     @OneToMany(fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<PostEntity> posts;
 
     @Override
