@@ -39,7 +39,7 @@ public class AdminController {
 
     /* ============================
        POST MANAGEMENT
-       ============================ */
+       ====================userId======== */
 
     // View all posts
     @GetMapping("/posts")
