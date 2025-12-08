@@ -20,10 +20,13 @@ public class LikeService {
     private final UserRepository userRepository;
 
     public void likePost(UUID post_id, UUID user_id) {
-        UserEntity user = userRepository.findById(user_id).orElseThrow();
-        PostEntity post = postRepository.findById(post_id).orElseThrow();
-        if (repository.existsByUser_IdAndPost_Id(user.getId(), post.getId())) {
-            PostLikeEntity like = repository.findByPost_IdAndUser_Id(user.getId(), post.getId()).orElseThrow();
+        UserEntity user = userRepository.findById(user_id)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + user_id));
+        PostEntity post = postRepository.findById(post_id)
+                .orElseThrow(() -> new RuntimeException("Post not found with id: " + post_id));
+        if (repository.existsByUser_IdAndPost_Id(user_id, post_id)) {
+            PostLikeEntity like = repository.findByPost_IdAndUser_Id(post_id, user_id)
+                    .orElseThrow(() -> new RuntimeException("The like found but actualy it's not found"));
             repository.delete(like);
         } else {
             repository.save(PostLikeEntity.builder().user(user).post(post).build());

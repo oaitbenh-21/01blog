@@ -16,16 +16,17 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 @Data
 @Entity
 @Builder
-@NoArgsConstructor
+@RequiredArgsConstructor
 @AllArgsConstructor
 @Table(name = "_posts")
 public class PostEntity {
@@ -44,4 +45,9 @@ public class PostEntity {
     @LastModifiedDate
     @Column(insertable = false)
     private LocalDateTime lastUpdateTime;
+
+    @PrePersist
+    protected void onCreate() {
+        this.creationTime = LocalDateTime.now();
+    }
 }
