@@ -55,6 +55,7 @@ public class UserEntity implements UserDetails, Principal {
     private Long followers;
     private Long following;
     private Role role;
+    private boolean banned;
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<PostLikeEntity> liked;
     @CreatedDate
