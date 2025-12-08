@@ -29,26 +29,21 @@ public class JwtFilter extends OncePerRequestFilter {
             @NotNull HttpServletResponse res,
             @NotNull FilterChain filter)
             throws ServletException, IOException {
-        System.out.println("I Arrived Here");
         if (req.getServletPath().contains("api/v1/auth")) {
             filter.doFilter(req, res);
             return;
         }
         final String AuthHeader = req.getHeader(org.springframework.http.HttpHeaders.AUTHORIZATION);
         final String jwt;
-        System.out.println("I Arrived Here");
         if (AuthHeader == null || !AuthHeader.startsWith("Bearer ")) {
             filter.doFilter(req, res);
             return;
         }
-        System.out.println("I Arrived Here||||||||||||||");
         jwt = AuthHeader.substring(7);
         final String userName = jwtService.extractUsername(jwt);
         if (userName != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            System.out.println("I Arrived Here(((((((((((((((");
             UserDetails userDetails = userDetailsService.loadUserByUsername(userName);
             if (jwtService.isTokenValid(jwt, userDetails)) {
-                System.out.println("I Arrived Here))))))))))");
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails,
                         null, userDetails.getAuthorities());
 
@@ -57,7 +52,6 @@ public class JwtFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         }
-        System.out.println("I Arrived Here");
         filter.doFilter(req, res);
     }
 }
