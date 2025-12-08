@@ -37,6 +37,10 @@ public class PostEntity {
     @OneToMany(mappedBy = "post")
     private List<PostLikeEntity> likes;
     private Long comments;
+    @Column(nullable = false)
+    private boolean hidden;
+    @Column(nullable = false)
+    private boolean banned;
     @ManyToOne
     private UserEntity author;
     @CreatedDate
