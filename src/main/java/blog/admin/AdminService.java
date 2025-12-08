@@ -1,8 +1,13 @@
 package blog.admin;
 
+import java.util.List;
+import java.util.UUID;
+
 import org.springframework.stereotype.Service;
 
+import blog.post.jpa.PostEntity;
 import blog.post.jpa.PostRepository;
+import blog.user.jpa.UserEntity;
 import blog.user.jpa.UserRepository;
 import lombok.AllArgsConstructor;
 
@@ -20,12 +25,12 @@ public class AdminService {
      * ============================
      */
 
-    public void showAllUsers() {
-        // view all users
+    public List<UserEntity> showAllUsers() {
+        return userRepo.findAll();
     }
 
-    public void showAllPosts() {
-        // view all posts
+    public List<PostEntity> showAllPosts() {
+        return postRepo.findAll();
     }
 
     public void showAllReports() {
@@ -42,8 +47,12 @@ public class AdminService {
      * ============================
      */
 
-    public void deletePost(Long postId) {
-        // permanently delete post
+    public boolean deletePost(UUID post_id) {
+        if (postRepo.existsById(post_id)) {
+            postRepo.deleteById(post_id);
+            return true;
+        }
+        return false;
     }
 
     public void hidePost(Long postId) {
@@ -60,8 +69,12 @@ public class AdminService {
      * ============================
      */
 
-    public void deleteUser(Long userId) {
-        // permanently delete user
+    public boolean deleteUser(UUID user_id) {
+        if (userRepo.existsById(user_id)) {
+            userRepo.deleteById(user_id);
+            return true;
+        }
+        return false;
     }
 
     public void banUser(Long userId) {
