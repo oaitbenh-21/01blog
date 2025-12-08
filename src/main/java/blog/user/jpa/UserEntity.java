@@ -18,6 +18,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import blog.like.jpa.PostLikeEntity;
 import blog.post.jpa.PostEntity;
 import blog.user.jpa.utils.Role;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
@@ -54,7 +55,7 @@ public class UserEntity implements UserDetails, Principal {
     private Long followers;
     private Long following;
     private Role role;
-    @OneToMany(fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<PostLikeEntity> liked;
     @CreatedDate
     @Column(nullable = false, updatable = false)
