@@ -1,4 +1,4 @@
-package blog.comment;
+package blog.post.app.comment;
 
 import java.util.UUID;
 
@@ -11,9 +11,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import blog.comment.dto.CommentDTO;
-import blog.comment.jpa.CommentEntity;
-import blog.comment.service.CommentService;
+import blog.post.app.comment.dto.CommentDTO;
+import blog.post.app.comment.jpa.CommentEntity;
+import blog.post.app.comment.service.CommentService;
 import blog.user.jpa.UserEntity;
 import lombok.RequiredArgsConstructor;
 

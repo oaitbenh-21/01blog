@@ -1,4 +1,4 @@
-package blog.comment.jpa;
+package blog.post.app.comment.jpa;
 
 import java.util.UUID;
 

@@ -1,4 +1,4 @@
-package blog.like.jpa;
+package blog.post.app.like.jpa;
 
 import java.time.LocalDateTime;
 

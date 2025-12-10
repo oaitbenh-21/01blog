@@ -15,7 +15,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import blog.like.jpa.PostLikeEntity;
+import blog.post.app.like.jpa.PostLikeEntity;
 import blog.post.jpa.PostEntity;
 import blog.user.jpa.utils.Role;
 import jakarta.persistence.CascadeType;

@@ -1,11 +1,11 @@
-package blog.like.service;
+package blog.post.app.like.service;
 
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
-import blog.like.jpa.PostLikeEntity;
-import blog.like.jpa.PostLikeRepository;
+import blog.post.app.like.jpa.PostLikeEntity;
+import blog.post.app.like.jpa.PostLikeRepository;
 import blog.post.jpa.PostEntity;
 import blog.post.jpa.PostRepository;
 import blog.user.jpa.UserEntity;
