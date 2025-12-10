@@ -1,13 +1,13 @@
-package blog.comment.service;
+package blog.post.app.comment.service;
 
 import java.util.List;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
-import blog.comment.dto.CommentDTO;
-import blog.comment.jpa.CommentEntity;
-import blog.comment.jpa.CommentRepository;
+import blog.post.app.comment.dto.CommentDTO;
+import blog.post.app.comment.jpa.CommentEntity;
+import blog.post.app.comment.jpa.CommentRepository;
 import blog.post.jpa.PostEntity;
 import blog.post.jpa.PostRepository;
 import blog.user.jpa.UserEntity;

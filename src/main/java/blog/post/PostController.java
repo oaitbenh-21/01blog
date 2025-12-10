@@ -43,8 +43,8 @@ public class PostController {
     }
 
     @GetMapping("/{uuid}")
-    public ResponseEntity<PostResponse> getPost(@PathVariable UUID uuid) {
-        return ResponseEntity.ok(service.getPost(uuid));
+    public ResponseEntity<PostResponse> getPost(@PathVariable UUID uuid, Authentication auth) {
+        return ResponseEntity.ok(service.getPost(uuid, (UserEntity) auth.getPrincipal()));
     }
 
 }

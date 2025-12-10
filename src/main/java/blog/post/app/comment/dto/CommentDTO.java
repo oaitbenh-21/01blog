@@ -1,4 +1,4 @@
-package blog.comment.dto;
+package blog.post.app.comment.dto;
 
 import java.util.UUID;
 

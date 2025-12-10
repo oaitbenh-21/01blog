@@ -1,4 +1,4 @@
-package blog.admin.dto;
+package blog.user.app.admin.dto;
 
 public class AllEntities {
     // private List<UserEntity> users;

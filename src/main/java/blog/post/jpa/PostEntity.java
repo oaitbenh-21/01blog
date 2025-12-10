@@ -7,8 +7,8 @@ import java.util.UUID;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
-import blog.comment.jpa.CommentEntity;
-import blog.like.jpa.PostLikeEntity;
+import blog.post.app.comment.jpa.CommentEntity;
+import blog.post.app.like.jpa.PostLikeEntity;
 import blog.user.jpa.UserEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;

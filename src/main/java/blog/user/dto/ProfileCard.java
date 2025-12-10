@@ -10,11 +10,13 @@ public class ProfileCard {
     private UUID id;
     private String avatar;
     private String username;
+    private boolean banned;
     private Long followers;
     private Long following;
 
     public static ProfileCard fromEntity(UserEntity entity) {
         ProfileCard profile = new ProfileCard();
+        profile.setBanned(entity.isBanned());
         profile.setId(entity.getId());
         profile.setAvatar(entity.getAvatar());
         profile.setFollowers(entity.getFollowers());

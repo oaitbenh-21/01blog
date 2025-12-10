@@ -31,8 +31,11 @@ public class PostService {
         repository.save(post);
     }
 
-    public PostResponse getPost(UUID id) {
-        PostEntity post = repository.findById(id).orElseThrow(() -> new RuntimeException("Post Not Found"));
+    public PostResponse getPost(UUID post_id, UserEntity user) {
+        if (!repository.isVisibleTo(post_id, user.getId())) {
+            throw new RuntimeException("You can't see this post");
+        }
+        PostEntity post = repository.findById(post_id).orElseThrow(() -> new RuntimeException("Post Not Found"));
         return new PostResponse(post);
     }
 }

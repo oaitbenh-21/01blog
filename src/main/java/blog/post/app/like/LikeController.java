@@ -1,4 +1,4 @@
-package blog.like;
+package blog.post.app.like;
 
 import java.util.UUID;
 
@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import blog.like.service.LikeService;
+import blog.post.app.like.service.LikeService;
 import blog.user.jpa.UserEntity;
 import lombok.RequiredArgsConstructor;
 
