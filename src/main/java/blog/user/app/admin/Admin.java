@@ -22,7 +22,7 @@ import lombok.AllArgsConstructor;
 @RestController
 @RequestMapping("/admin")
 @AllArgsConstructor
-public class AdminController {
+public class Admin {
 
     private final PostRepository postRepo;
     private final UserRepository userRepo;
