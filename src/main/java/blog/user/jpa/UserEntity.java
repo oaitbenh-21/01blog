@@ -64,6 +64,7 @@ public class UserEntity implements UserDetails, Principal {
     @LastModifiedDate
     @Column(insertable = false)
     private LocalDateTime lastUpdateTime;
+    // posts
     @OneToMany(fetch = FetchType.LAZY)
     @JsonIgnore
     private List<PostEntity> posts;

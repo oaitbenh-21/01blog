@@ -25,7 +25,7 @@ public class PostService {
     public void createPost(PostRequest post_request, UserEntity user) {
         PostEntity post = PostEntity.builder()
                 .content(post_request.getContent())
-                .comments(0L)
+                .comment_count(0L)
                 .author(user)
                 .build();
         repository.save(post);

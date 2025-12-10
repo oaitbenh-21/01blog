@@ -26,7 +26,7 @@ public class PostResponse {
     public PostResponse(PostEntity post) {
         this.id = post.getId();
         this.content = post.getContent();
-        this.comments = post.getComments();
+        this.comments = post.getComment_count();
         if (post.getAuthor() != null) {
             this.author = new AuthorResponse(post.getAuthor());
         }
