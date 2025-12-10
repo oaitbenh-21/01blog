@@ -7,8 +7,10 @@ import java.util.UUID;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
+import blog.comment.jpa.CommentEntity;
 import blog.like.jpa.PostLikeEntity;
 import blog.user.jpa.UserEntity;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -34,9 +36,7 @@ public class PostEntity {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
     private String content;
-    @OneToMany(mappedBy = "post")
-    private List<PostLikeEntity> likes;
-    private Long comments;
+    private Long comment_count;
     @Column(nullable = false)
     private boolean hidden;
     @Column(nullable = false)
@@ -49,6 +49,12 @@ public class PostEntity {
     @LastModifiedDate
     @Column(insertable = false)
     private LocalDateTime lastUpdateTime;
+    // likes
+    @OneToMany(mappedBy = "post")
+    private List<PostLikeEntity> likes;
+    // comments
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+    List<CommentEntity> comments;
 
     @PrePersist
     protected void onCreate() {
