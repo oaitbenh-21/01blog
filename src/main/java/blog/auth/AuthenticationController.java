@@ -14,8 +14,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/auth")
+@RequiredArgsConstructor
 // @Tag(name = "Authentication")
 public class AuthenticationController {
     private final AuthenticationService service;

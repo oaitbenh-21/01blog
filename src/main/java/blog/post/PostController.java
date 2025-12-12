@@ -19,8 +19,8 @@ import blog.user.jpa.UserEntity;
 import lombok.AllArgsConstructor;
 
 @RestController
-@RequestMapping("/post")
 @AllArgsConstructor
+@RequestMapping("/post")
 public class PostController {
 
     private final PostService service;
