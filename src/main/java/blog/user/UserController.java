@@ -2,6 +2,7 @@ package blog.user;
 
 import java.util.UUID;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,7 +23,10 @@ public class UserController {
         return new ProfileCard();
     }
 
-    
+    @GetMapping("/ping")
+    public ResponseEntity<String> ping() {
+        return ResponseEntity.ok("{ status:success }");
+    }
 
     @GetMapping("/hotest")
     public Hotest hostest() {
