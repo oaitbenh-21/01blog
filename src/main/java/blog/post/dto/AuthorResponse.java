@@ -17,6 +17,7 @@ public class AuthorResponse {
     private String username;
     private String fullname;
     private String avatar;
+    private Boolean followed;
 
     public AuthorResponse(UserEntity user) {
         if (user != null) {

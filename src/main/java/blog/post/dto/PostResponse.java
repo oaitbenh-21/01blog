@@ -27,9 +27,7 @@ public class PostResponse {
         this.id = post.getId();
         this.content = post.getContent();
         this.comments = post.getComment_count();
-        if (post.getAuthor() != null) {
-            this.author = new AuthorResponse(post.getAuthor());
-        }
+        this.author = new AuthorResponse(post.getAuthor());
     }
 
 }
