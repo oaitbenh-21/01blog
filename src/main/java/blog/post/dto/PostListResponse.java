@@ -15,11 +15,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class PostListResponse {
     private List<PostResponse> posts;
-    private int currentPage;
-    private int totalPages;
-    private long totalElements;
-    private boolean hasNext;
-    private boolean hasPrevious;
 
     public static List<PostResponse> mapToPostResponseList(List<PostEntity> posts) {
         if (posts == null || posts.isEmpty()) {
