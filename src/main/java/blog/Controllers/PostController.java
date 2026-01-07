@@ -7,10 +7,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import blog.Dto.CommentDto;
 import blog.Dto.PostDto;
+import blog.Dto.PostResponseDto;
 import blog.Model.Post;
 import blog.Services.PostService;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/posts")
@@ -23,20 +25,23 @@ public class PostController {
     // Create a new post
     // ------------------------
     @PostMapping
-    public ResponseEntity<Post> createPost(@RequestPart("post") PostDto postDto,
-            @RequestPart(value = "media", required = false) List<MultipartFile> mediaFiles) {
-        Post createdPost = postService.createPost(postDto, mediaFiles);
-        return ResponseEntity.ok(createdPost);
+    public ResponseEntity<PostResponseDto> createPost(@RequestBody PostDto postDto) {
+        Post createdPost = postService.createPost(postDto);
+        return ResponseEntity.ok(PostResponseDto.from(createdPost));
     }
 
     // ------------------------
     // Get all posts (feed)
     // ------------------------
     @GetMapping
-    public ResponseEntity<List<Post>> getAllPosts(@RequestParam(defaultValue = "0") int page,
+    public ResponseEntity<List<PostResponseDto>> getAllPosts(@RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         List<Post> posts = postService.getAllPosts(page, size);
-        return ResponseEntity.ok(posts);
+        List<PostResponseDto> postDtos = posts.stream()
+                .map(PostResponseDto::from) // call the static from() for each Post
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(postDtos);
     }
 
     // ------------------------
