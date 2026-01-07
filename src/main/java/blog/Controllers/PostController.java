@@ -38,7 +38,7 @@ public class PostController {
             @RequestParam(defaultValue = "10") int size) {
         List<Post> posts = postService.getAllPosts(page, size);
         List<PostResponseDto> postDtos = posts.stream()
-                .map(PostResponseDto::from) // call the static from() for each Post
+                .map(PostResponseDto::from)
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(postDtos);
@@ -48,20 +48,20 @@ public class PostController {
     // Get post by ID
     // ------------------------
     @GetMapping("/{id}")
-    public ResponseEntity<Post> getPostById(@PathVariable Long id) {
+    public ResponseEntity<PostResponseDto> getPostById(@PathVariable Long id) {
         Post post = postService.getPostById(id);
-        return ResponseEntity.ok(post);
+        return ResponseEntity.ok(PostResponseDto.from(post));
     }
 
     // ------------------------
     // Update post
     // ------------------------
     @PutMapping("/{id}")
-    public ResponseEntity<Post> updatePost(@PathVariable Long id,
+    public ResponseEntity<PostResponseDto> updatePost(@PathVariable Long id,
             @RequestPart("post") PostDto postDto,
             @RequestPart(value = "media", required = false) List<MultipartFile> mediaFiles) {
         Post updatedPost = postService.updatePost(id, postDto, mediaFiles);
-        return ResponseEntity.ok(updatedPost);
+        return ResponseEntity.ok(PostResponseDto.from(updatedPost));
     }
 
     // ------------------------
