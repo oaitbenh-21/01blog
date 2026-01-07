@@ -37,7 +37,7 @@ public class PostService {
     @Autowired
     private LikeRepository likeRepository;
 
-    public Post createPost(PostDto postDto, List<MultipartFile> mediaFiles) {
+    public Post createPost(PostDto postDto) {
         User user = userService.getCurrentUser();
         Post post = new Post();
         post.setUser(user);
@@ -45,15 +45,6 @@ public class PostService {
         post = postRepository.save(post);
 
         // Handle media if provided
-        if (mediaFiles != null) {
-            for (MultipartFile file : mediaFiles) {
-                Media media = new Media();
-                media.setPost(post);
-                media.setUrl("uploaded_path/" + file.getOriginalFilename()); // Replace with actual storage logic
-                media.setType(blog.Model.enums.MediaType.IMAGE); // Simplified
-                mediaRepository.save(media);
-            }
-        }
         return post;
     }
 
