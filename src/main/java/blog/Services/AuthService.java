@@ -1,6 +1,5 @@
 package blog.Services;
 
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import blog.Dto.AuthResponse;
@@ -12,6 +11,7 @@ import blog.Model.enums.Role;
 import blog.Repositories.UserRepository;
 import blog.Security.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 
@@ -43,10 +43,9 @@ public class AuthService {
     }
 
     public AuthResponse login(LoginRequest request) {
-        Optional<User> userOpt = userRepository.findByEmail(request.getUsernameOrEmail());
+        Optional<User> userOpt = userRepository.findByEmail(request.getEmail());
         if (userOpt.isEmpty())
-            userOpt = userRepository.findByUsername(request.getUsernameOrEmail());
-
+            userOpt = userRepository.findByUsername(request.getEmail());
         if (userOpt.isEmpty())
             throw new RuntimeException("Invalid credentials");
 
