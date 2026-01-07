@@ -3,14 +3,15 @@ package blog.Controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import blog.Dto.ReportDto;
+import blog.Dto.UserDto;
 import blog.Model.Post;
 import blog.Model.User;
 import blog.Services.AdminService;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/admin")
@@ -20,8 +21,12 @@ public class AdminController {
     private AdminService adminService;
 
     @GetMapping("/users")
-    public ResponseEntity<List<User>> getAllUsers() {
-        return ResponseEntity.ok(adminService.getAllUsers());
+    public ResponseEntity<List<UserDto>> getAllUsers() {
+        List<User> users = adminService.getAllUsers();
+        List<UserDto> userDtos = users.stream()
+                .map(UserDto::from)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(userDtos);
     }
 
     @GetMapping("/posts")
