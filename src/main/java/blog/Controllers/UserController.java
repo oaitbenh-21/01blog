@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import blog.Dto.UserProfile;
 import blog.Model.User;
 import blog.Services.UserService;
 
@@ -18,20 +19,20 @@ public class UserController {
 
     // Get public profile (block page)
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUser(@PathVariable Long id) {
-        return ResponseEntity.ok(userService.getUserById(id));
+    public ResponseEntity<UserProfile> getUser(@PathVariable Long id) {
+        return ResponseEntity.ok(UserProfile.from(userService.getUserById(id)));
     }
 
     // Get current logged-in user
     @GetMapping("/me")
-    public ResponseEntity<User> getCurrentUser() {
-        return ResponseEntity.ok(userService.getCurrentUser());
+    public ResponseEntity<UserProfile> getCurrentUser() {
+        return ResponseEntity.ok(UserProfile.from(userService.getCurrentUser()));
     }
 
     // Update current user profile
     @PutMapping("/me")
-    public ResponseEntity<User> updateProfile(@RequestBody User updatedUser) {
-        return ResponseEntity.ok(userService.updateProfile(updatedUser));
+    public ResponseEntity<UserProfile> updateProfile(@RequestBody User updatedUser) {
+        return ResponseEntity.ok(UserProfile.from(userService.updateProfile(updatedUser)));
     }
 
     // Subscribe to a user
@@ -50,14 +51,25 @@ public class UserController {
 
     // Get subscriptions
     @GetMapping("/me/subscriptions")
-    public ResponseEntity<List<User>> getSubscriptions() {
-        return ResponseEntity.ok(userService.getSubscriptions());
+    public ResponseEntity<List<UserProfile>> getSubscriptions() {
+        List<User> users = userService.getSubscriptions();
+        if (users == null) {
+            return ResponseEntity.ok(List.of());
+        }
+        List<UserProfile> userProfiles = users.stream().map(UserProfile::from).toList();
+        return ResponseEntity.ok(userProfiles);
     }
 
     // Get subscribers
     @GetMapping("/me/subscribers")
-    public ResponseEntity<List<User>> getSubscribers() {
-        return ResponseEntity.ok(userService.getSubscribers());
+    public ResponseEntity<List<UserProfile>> getSubscribers() {
+        List<User> users = userService.getSubscribers();
+        if (users == null) {
+            return ResponseEntity.ok(List.of());
+        }
+        List<UserProfile> userProfiles = users.stream().map(UserProfile::from).toList();
+
+        return ResponseEntity.ok(userProfiles);
     }
 
     // Admin: delete user
