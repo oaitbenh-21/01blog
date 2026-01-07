@@ -26,6 +26,10 @@ public class PostResponseDto {
         List<CommentResponseDto> comments = postComments.stream()
                 .map(CommentResponseDto::from)
                 .collect(Collectors.toList());
-        return new PostResponseDto(post.getContent(), PostAuthor.from(user), post.getLikes().size(), comments);
+        int likesCount = 0;
+        if (post.getLikes() != null) {
+            likesCount = post.getLikes().size();
+        }
+        return new PostResponseDto(post.getContent(), PostAuthor.from(user), likesCount, comments);
     }
 }
