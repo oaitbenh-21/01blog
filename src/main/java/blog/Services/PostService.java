@@ -42,6 +42,10 @@ public class PostService {
         Post post = new Post();
         post.setUser(user);
         post.setContent(postDto.getContent());
+        List<Like> likes = List.of();
+        post.setLikes(likes);
+        List<Comment> comments = List.of();
+        post.setComments(comments);
         post = postRepository.save(post);
 
         // Handle media if provided
