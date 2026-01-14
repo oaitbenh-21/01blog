@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 
 import blog.Dto.ReportDto;
 import blog.Model.Report;
+import blog.Model.User;
 import blog.Model.enums.ReportStatus;
 import blog.Repositories.ReportRepository;
 
@@ -20,8 +21,12 @@ public class ReportService {
     private UserService userService;
 
     public void submitReport(ReportDto dto) {
+        User user = userService.getCurrentUser();
+        if (user.getId().equals(dto.getReportedUserId())) {
+            throw new RuntimeException("Cannot report yourself");
+        }
         Report report = new Report();
-        report.setReportedBy(userService.getCurrentUser());
+        report.setReportedBy(user);
         report.setReportedUser(userService.getUserById(dto.getReportedUserId()));
         report.setReason(dto.getReason());
         reportRepository.save(report);
@@ -46,6 +51,6 @@ public class ReportService {
                 .orElseThrow(() -> new RuntimeException("Report not found"));
         report.setStatus(ReportStatus.RESOLVED);
         reportRepository.save(report);
-        // Action could be ban user or delete post; handle externally
+        // action could be ban user or delete post; handle externally
     }
 }
