@@ -5,19 +5,17 @@ import org.springframework.boot.data.autoconfigure.web.DataWebProperties.Pageabl
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import blog.Dto.CommentDto;
 import blog.Dto.PostDto;
 import blog.Model.Comment;
 import blog.Model.Like;
-import blog.Model.Media;
 import blog.Model.Post;
 import blog.Model.Subscription;
 import blog.Model.User;
+import blog.Model.enums.Role;
 import blog.Repositories.CommentRepository;
 import blog.Repositories.LikeRepository;
-import blog.Repositories.MediaRepository;
 import blog.Repositories.PostRepository;
 
 import java.util.List;
@@ -30,9 +28,6 @@ public class PostService {
 
     @Autowired
     private UserService userService;
-
-    @Autowired
-    private MediaRepository mediaRepository;
 
     @Autowired
     private CommentRepository commentRepository;
@@ -73,27 +68,26 @@ public class PostService {
         return postRepository.findById(id).orElseThrow(() -> new RuntimeException("Post not found"));
     }
 
-    public Post updatePost(Long id, PostDto postDto, List<MultipartFile> mediaFiles) {
+    public Post updatePost(Long id, PostDto postDto) {
+        if (postDto.getContent() == null || postDto.getContent().isBlank()) {
+            throw new RuntimeException("Post content cannot be empty");
+        }
         Post post = getPostById(id);
+        if (userService.getCurrentUser().getId() != post.getUser().getId()) {
+            throw new RuntimeException("Unauthorized");
+        }
         post.setContent(postDto.getContent());
         Post updated = postRepository.save(post);
-
-        if (mediaFiles != null) {
-            mediaRepository.deleteByPost(post);
-            for (MultipartFile file : mediaFiles) {
-                Media media = new Media();
-                media.setPost(updated);
-                media.setUrl("uploaded_path/" + file.getOriginalFilename());
-                media.setType(blog.Model.enums.MediaType.IMAGE); // Simplified
-                mediaRepository.save(media);
-            }
-        }
         return updated;
     }
 
     public void deletePost(Long id) {
         Post post = getPostById(id);
         post.setDeleted(true);
+        if (userService.getCurrentUser().getId() != post.getUser().getId()
+                && userService.getCurrentUser().getRole() != Role.ADMIN) {
+            throw new RuntimeException("Unauthorized");
+        }
         postRepository.save(post);
     }
 

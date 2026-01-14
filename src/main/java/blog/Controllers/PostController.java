@@ -50,6 +50,9 @@ public class PostController {
         return ResponseEntity.ok(postDtos);
     }
 
+    // ------------------------
+    // Get posts by followed users
+    // ------------------------
     @GetMapping("/followed")
     public ResponseEntity<List<PostResponseDto>> getByFollowedUsers(
             @PageableDefault(size = 10) Pageable pageable) {
@@ -58,7 +61,6 @@ public class PostController {
         for (Post post : posts) {
             postDtos.add(PostResponseDto.from(post, userService.postLikedByUser(post.getId())));
         }
-
         return ResponseEntity.ok(postDtos);
     }
 
@@ -68,6 +70,9 @@ public class PostController {
     @GetMapping("/{id}")
     public ResponseEntity<PostResponseDto> getPostById(@PathVariable Long id) {
         Post post = postService.getPostById(id);
+        if (post.isDeleted()) {
+            return ResponseEntity.notFound().build();
+        }
         return ResponseEntity.ok(PostResponseDto.from(post, userService.postLikedByUser(post.getId())));
     }
 
@@ -76,9 +81,8 @@ public class PostController {
     // ------------------------
     @PutMapping("/{id}")
     public ResponseEntity<PostResponseDto> updatePost(@PathVariable Long id,
-            @RequestPart("post") PostDto postDto,
-            @RequestPart(value = "media", required = false) List<MultipartFile> mediaFiles) {
-        Post updatedPost = postService.updatePost(id, postDto, mediaFiles);
+            @RequestPart("post") PostDto postDto) {
+        Post updatedPost = postService.updatePost(id, postDto);
         return ResponseEntity.ok(PostResponseDto.from(updatedPost, userService.postLikedByUser(updatedPost.getId())));
     }
 
