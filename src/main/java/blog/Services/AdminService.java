@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import blog.Dto.ReportDto;
 import blog.Model.Post;
 import blog.Model.User;
+import blog.Repositories.CommentRepository;
 import blog.Repositories.PostRepository;
 import blog.Repositories.UserRepository;
 
@@ -24,6 +25,8 @@ public class AdminService {
 
     @Autowired
     private ReportService reportService;
+    @Autowired
+    private CommentRepository commentRepository;
 
     public List<User> getAllUsers() {
         return userRepository.findAll();
@@ -47,6 +50,11 @@ public class AdminService {
 
     public void resolveReport(Long id, String action) {
         reportService.resolveReport(id, action);
+    }
+
+    public void deleteComment(Long id) {
+        commentRepository
+                .delete(commentRepository.findById(id).orElseThrow(() -> new RuntimeException("Comment not found")));
     }
 
     public Map<String, Object> getAnalytics() {

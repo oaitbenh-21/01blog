@@ -51,6 +51,13 @@ public class AdminController {
         return ResponseEntity.ok("Post deleted successfully.");
     }
 
+        @DeleteMapping("/comment/{id}")
+    public ResponseEntity<String> deleteComment(@PathVariable Long id) {
+        adminService.deleteComment(id);
+        return ResponseEntity.ok("Post deleted successfully.");
+    }
+
+
     @PostMapping("/reports/{id}/resolve")
     public ResponseEntity<String> resolveReport(@PathVariable Long id, @RequestBody String action) {
         adminService.resolveReport(id, action);
