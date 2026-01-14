@@ -87,10 +87,16 @@ public class PostService {
     public void toggleLike(Long postId) {
         Post post = getPostById(postId);
         User user = userService.getCurrentUser();
-        likeRepository.findByPostAndUser(post, user)
-                .ifPresentOrElse(
-                        likeRepository::delete,
-                        () -> likeRepository.save(new Like(null, post, user, null)));
+        if (likeRepository.existsByPostIdAndUserId(postId, user.getId())) {
+            Like like = likeRepository.findByPostAndUser(post, user)
+                    .orElseThrow(() -> new RuntimeException("Like not found"));
+            likeRepository.delete(like);
+        } else {
+            Like like = new Like();
+            like.setPost(post);
+            like.setUser(user);
+            likeRepository.save(like);
+        }
     }
 
     public void addComment(Long postId, CommentDto commentDto) {

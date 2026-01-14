@@ -11,10 +11,11 @@ public class UserDto {
     private String username;
     private String avatar;
     private String email;
+    private String bio;
     private String role;
 
     public static UserDto from(User user) {
-        return new UserDto(user.getId(), user.getUsername(), user.getAvatarUrl(), user.getEmail(),
+        return new UserDto(user.getId(), user.getUsername(), user.getAvatarUrl(), user.getEmail(), user.getBio(),
                 user.getRole().name());
     }
 }

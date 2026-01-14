@@ -15,13 +15,15 @@ public class PostResponseDto {
     private String content;
     private PostAuthor author;
     private int likes;
+    private boolean likedByCurrentUser;
     private List<CommentResponseDto> comments;
 
-    public static PostResponseDto from(Post post) {
+    public static PostResponseDto from(Post post, boolean likedByCurrentUser) {
         User user = post.getUser();
         List<Comment> postComments = post.getComments();
         if (postComments == null) {
-            return new PostResponseDto(post.getContent(), PostAuthor.from(user), post.getLikes().size(), List.of());
+            return new PostResponseDto(post.getContent(), PostAuthor.from(user), post.getLikes().size(),
+                    likedByCurrentUser, List.of());
         }
         List<CommentResponseDto> comments = postComments.stream()
                 .map(CommentResponseDto::from)
@@ -30,6 +32,6 @@ public class PostResponseDto {
         if (post.getLikes() != null) {
             likesCount = post.getLikes().size();
         }
-        return new PostResponseDto(post.getContent(), PostAuthor.from(user), likesCount, comments);
+        return new PostResponseDto(post.getContent(), PostAuthor.from(user), likesCount, likedByCurrentUser, comments);
     }
 }
