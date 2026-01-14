@@ -45,10 +45,14 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Post> posts;
-    @OneToMany(mappedBy = "follower", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Subscription> following;
-    @OneToMany(mappedBy = "followed", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Subscription> followers;
+
+    @ManyToOne
+    @JoinColumn(name = "follower_id")
+    private List<User> follower;
+
+    @ManyToOne
+    @JoinColumn(name = "following_id")
+    private List<User> following;
 
     @PrePersist
     protected void onCreate() {

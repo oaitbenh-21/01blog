@@ -47,22 +47,22 @@ public class UserController {
     }
 
     // Subscribe to a user
-    @PostMapping("/{id}/subscribe")
-    public ResponseEntity<String> subscribe(@PathVariable Long id) {
-        if (id.equals(userService.getCurrentUser().getId())) {
-            throw new RuntimeException("Cannot subscribe to yourself");
-        }
-        userService.subscribe(id);
-        return ResponseEntity.ok("Subscribed successfully.");
-    }
+    // @PostMapping("/{id}/subscribe")
+    // public ResponseEntity<String> subscribe(@PathVariable Long id) {
+    // if (id.equals(userService.getCurrentUser().getId())) {
+    // throw new RuntimeException("Cannot subscribe to yourself");
+    // }
+    // userService.subscribe(id);
+    // return ResponseEntity.ok("Subscribed successfully.");
+    // }
 
     // Unsubscribe
-    @DeleteMapping("/{id}/unsubscribe")
-    public ResponseEntity<String> unsubscribe(@PathVariable Long id) {
-        if (id.equals(userService.getCurrentUser().getId())) {
-            throw new RuntimeException("Cannot unsubscribe to yourself");
-        }
-        userService.unsubscribe(id);
-        return ResponseEntity.ok("Unsubscribed successfully.");
-    }
+    // @DeleteMapping("/{id}/unsubscribe")
+    // public ResponseEntity<String> unsubscribe(@PathVariable Long id) {
+    // if (id.equals(userService.getCurrentUser().getId())) {
+    // throw new RuntimeException("Cannot unsubscribe to yourself");
+    // }
+    // userService.unsubscribe(id);
+    // return ResponseEntity.ok("Unsubscribed successfully.");
+    // }
 }

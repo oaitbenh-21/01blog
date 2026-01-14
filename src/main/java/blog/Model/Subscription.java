@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "subscriptions", uniqueConstraints = @UniqueConstraint(columnNames = { "follower_id", "following_id" }))
@@ -20,11 +21,11 @@ public class Subscription {
 
     @ManyToOne
     @JoinColumn(name = "follower_id")
-    private User follower;
+    private List<User> follower;
 
     @ManyToOne
     @JoinColumn(name = "following_id")
-    private User following;
+    private List<User> following;
 
     private LocalDateTime createdAt;
 
