@@ -5,7 +5,6 @@ import org.springframework.boot.data.autoconfigure.web.DataWebProperties.Pageabl
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import blog.Dto.CommentDto;
 import blog.Dto.PostDto;
@@ -70,9 +69,6 @@ public class PostController {
     @GetMapping("/{id}")
     public ResponseEntity<PostResponseDto> getPostById(@PathVariable Long id) {
         Post post = postService.getPostById(id);
-        if (post.isDeleted()) {
-            return ResponseEntity.notFound().build();
-        }
         return ResponseEntity.ok(PostResponseDto.from(post, userService.postLikedByUser(post.getId())));
     }
 
