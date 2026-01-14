@@ -10,9 +10,10 @@ import blog.Dto.PostDto;
 import blog.Dto.PostResponseDto;
 import blog.Model.Post;
 import blog.Services.PostService;
+import blog.Services.UserService;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/posts")
@@ -20,6 +21,8 @@ public class PostController {
 
     @Autowired
     private PostService postService;
+    @Autowired
+    private UserService userService;
 
     // ------------------------
     // Create a new post
@@ -27,7 +30,7 @@ public class PostController {
     @PostMapping
     public ResponseEntity<PostResponseDto> createPost(@RequestBody PostDto postDto) {
         Post createdPost = postService.createPost(postDto);
-        return ResponseEntity.ok(PostResponseDto.from(createdPost));
+        return ResponseEntity.ok(PostResponseDto.from(createdPost, userService.postLikedByUser(createdPost.getId())));
     }
 
     // ------------------------
@@ -37,9 +40,10 @@ public class PostController {
     public ResponseEntity<List<PostResponseDto>> getAllPosts(@RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         List<Post> posts = postService.getAllPosts(page, size);
-        List<PostResponseDto> postDtos = posts.stream()
-                .map(PostResponseDto::from)
-                .collect(Collectors.toList());
+        List<PostResponseDto> postDtos = new ArrayList<>();
+        for (Post post : posts) {
+            postDtos.add(PostResponseDto.from(post, userService.postLikedByUser(post.getId())));
+        }
 
         return ResponseEntity.ok(postDtos);
     }
@@ -50,7 +54,7 @@ public class PostController {
     @GetMapping("/{id}")
     public ResponseEntity<PostResponseDto> getPostById(@PathVariable Long id) {
         Post post = postService.getPostById(id);
-        return ResponseEntity.ok(PostResponseDto.from(post));
+        return ResponseEntity.ok(PostResponseDto.from(post, userService.postLikedByUser(post.getId())));
     }
 
     // ------------------------
@@ -61,7 +65,7 @@ public class PostController {
             @RequestPart("post") PostDto postDto,
             @RequestPart(value = "media", required = false) List<MultipartFile> mediaFiles) {
         Post updatedPost = postService.updatePost(id, postDto, mediaFiles);
-        return ResponseEntity.ok(PostResponseDto.from(updatedPost));
+        return ResponseEntity.ok(PostResponseDto.from(updatedPost, userService.postLikedByUser(updatedPost.getId())));
     }
 
     // ------------------------

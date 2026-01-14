@@ -1,7 +1,6 @@
 package blog.Dto;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import blog.Model.User;
 import lombok.Builder;
@@ -17,18 +16,14 @@ public class UserProfile {
     private String role;
     private List<PostResponseDto> posts;
 
-    public static UserProfile from(User user) {
+    public static UserProfile from(User user, List<PostResponseDto> posts) {
         return UserProfile.builder()
                 .id(user.getId())
                 .username(user.getUsername())
                 .email(user.getEmail())
                 .bio(user.getBio())
                 .role(user.getRole().name())
-                .posts(
-                        user.getPosts()
-                                .stream()
-                                .map(PostResponseDto::from)
-                                .collect(Collectors.toList()))
+                .posts(posts)
                 .build();
     }
 

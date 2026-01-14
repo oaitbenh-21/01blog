@@ -4,10 +4,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import blog.Dto.PostResponseDto;
+import blog.Dto.UserDto;
 import blog.Dto.UserProfile;
-import blog.Model.User;
+import blog.Model.Post;
 import blog.Services.UserService;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -20,24 +23,35 @@ public class UserController {
     // Get public profile (block page)
     @GetMapping("/{id}")
     public ResponseEntity<UserProfile> getUser(@PathVariable Long id) {
-        return ResponseEntity.ok(UserProfile.from(userService.getUserById(id)));
-    }
-
-    // Get current logged-in user
-    @GetMapping("/me")
-    public ResponseEntity<UserProfile> getCurrentUser() {
-        return ResponseEntity.ok(UserProfile.from(userService.getCurrentUser()));
+        List<Post> posts = userService.getPostsByUserId(id);
+        List<PostResponseDto> postDtos = new ArrayList<>();
+        for (Post post : posts) {
+            postDtos.add(PostResponseDto.from(post, userService.postLikedByUser(post.getId())));
+        }
+        return ResponseEntity.ok(UserProfile.from(userService.getUserById(id), postDtos));
     }
 
     // Update current user profile
     @PutMapping("/me")
-    public ResponseEntity<UserProfile> updateProfile(@RequestBody User updatedUser) {
-        return ResponseEntity.ok(UserProfile.from(userService.updateProfile(updatedUser)));
+    public ResponseEntity<UserDto> updateProfile(@RequestBody UserDto updatedUser) { // i should to edit requestbody to
+                                                                                     // UserDto
+        if (updatedUser.getId() == null || (updatedUser.getId() != userService.getCurrentUser().getId())) {
+            throw new RuntimeException("User ID is required for update");
+        }
+        List<Post> posts = userService.getPostsByUserId(userService.UpdateProfile(updatedUser).getId());
+        List<PostResponseDto> postDtos = new ArrayList<>();
+        for (Post post : posts) {
+            postDtos.add(PostResponseDto.from(post, userService.postLikedByUser(post.getId())));
+        }
+        return ResponseEntity.ok(updatedUser);
     }
 
     // Subscribe to a user
     @PostMapping("/{id}/subscribe")
     public ResponseEntity<String> subscribe(@PathVariable Long id) {
+        if (id.equals(userService.getCurrentUser().getId())) {
+            throw new RuntimeException("Cannot subscribe to yourself");
+        }
         userService.subscribe(id);
         return ResponseEntity.ok("Subscribed successfully.");
     }
@@ -45,37 +59,10 @@ public class UserController {
     // Unsubscribe
     @DeleteMapping("/{id}/unsubscribe")
     public ResponseEntity<String> unsubscribe(@PathVariable Long id) {
+        if (id.equals(userService.getCurrentUser().getId())) {
+            throw new RuntimeException("Cannot unsubscribe to yourself");
+        }
         userService.unsubscribe(id);
         return ResponseEntity.ok("Unsubscribed successfully.");
-    }
-
-    // Get subscriptions
-    @GetMapping("/me/subscriptions")
-    public ResponseEntity<List<UserProfile>> getSubscriptions() {
-        List<User> users = userService.getSubscriptions();
-        if (users == null) {
-            return ResponseEntity.ok(List.of());
-        }
-        List<UserProfile> userProfiles = users.stream().map(UserProfile::from).toList();
-        return ResponseEntity.ok(userProfiles);
-    }
-
-    // Get subscribers
-    @GetMapping("/me/subscribers")
-    public ResponseEntity<List<UserProfile>> getSubscribers() {
-        List<User> users = userService.getSubscribers();
-        if (users == null) {
-            return ResponseEntity.ok(List.of());
-        }
-        List<UserProfile> userProfiles = users.stream().map(UserProfile::from).toList();
-
-        return ResponseEntity.ok(userProfiles);
-    }
-
-    // Admin: delete user
-    @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteUser(@PathVariable Long id) {
-        userService.deleteUser(id);
-        return ResponseEntity.ok("User deleted successfully.");
     }
 }
