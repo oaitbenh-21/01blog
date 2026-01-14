@@ -19,6 +19,8 @@ public class AdminService {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private UserService userService;
 
     @Autowired
     private PostRepository postRepository;
@@ -41,6 +43,9 @@ public class AdminService {
     }
 
     public void deleteUser(Long id) {
+        if (userService.getCurrentUser().getId().equals(id)) {
+            throw new RuntimeException("admin cannot delete themselves");
+        }
         userRepository.deleteById(id);
     }
 
