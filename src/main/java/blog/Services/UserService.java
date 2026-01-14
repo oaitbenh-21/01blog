@@ -6,11 +6,9 @@ import org.springframework.stereotype.Service;
 
 import blog.Model.User;
 import blog.Repositories.LikeRepository;
-import blog.Repositories.SubscriptionRepository;
 import blog.Repositories.UserRepository;
 import blog.Dto.UserDto;
 import blog.Model.Post;
-import blog.Model.Subscription;
 
 import java.util.List;
 
@@ -21,9 +19,6 @@ public class UserService {
     private UserRepository userRepository;
     @Autowired
     private LikeRepository likeRepository;
-
-    @Autowired
-    private SubscriptionRepository subscriptionRepository;
 
     public boolean postLikedByUser(Long postId) {
         return likeRepository.existsByPostIdAndUserId(postId, getCurrentUser().getId());
@@ -65,30 +60,20 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public void subscribe(Long id) {
-        User current = getCurrentUser();
-        User toFollow = getUserById(id);
-        if (subscriptionRepository.existsByFollowerAndFollowing(current, toFollow))
-            throw new RuntimeException("Already subscribed");
-        subscriptionRepository.save(new Subscription(null, current, toFollow, null));
-    }
+    // public void subscribe(Long id) {
+    // User current = getCurrentUser();
+    // User toFollow = getUserById(id);
+    // if (subscriptionRepository.existsByFollowerAndFollowing(current, toFollow))
+    // throw new RuntimeException("Already subscribed");
+    // subscriptionRepository.save(new Subscription(null, current, toFollow, null));
+    // }
 
-    public void unsubscribe(Long id) {
-        User current = getCurrentUser();
-        User toUnfollow = getUserById(id);
-        subscriptionRepository.findByFollowerAndFollowing(current, toUnfollow)
-                .ifPresent(subscriptionRepository::delete);
-    }
-
-    public List<User> getSubscriptions() {
-        return subscriptionRepository.findByFollower(getCurrentUser())
-                .stream().map(sub -> sub.getFollowing()).toList();
-    }
-
-    public List<User> getSubscribers() {
-        return subscriptionRepository.findByFollowing(getCurrentUser())
-                .stream().map(sub -> sub.getFollower()).toList();
-    }
+    // public void unsubscribe(Long id) {
+    // User current = getCurrentUser();
+    // User toUnfollow = getUserById(id);
+    // subscriptionRepository.findByFollowerAndFollowing(current, toUnfollow)
+    // .ifPresent(subscriptionRepository::delete);
+    // }
 
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
