@@ -1,6 +1,8 @@
 package blog.Services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.data.autoconfigure.web.DataWebProperties.Pageable;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -11,6 +13,7 @@ import blog.Model.Comment;
 import blog.Model.Like;
 import blog.Model.Media;
 import blog.Model.Post;
+import blog.Model.Subscription;
 import blog.Model.User;
 import blog.Repositories.CommentRepository;
 import blog.Repositories.LikeRepository;
@@ -54,6 +57,16 @@ public class PostService {
 
     public List<Post> getAllPosts(int page, int size) {
         return postRepository.findByIsDeletedFalse(PageRequest.of(page, size)).toList();
+    }
+
+    public Page<Post> getByFollowedUsers(Pageable pageable) {
+        User currentUser = userService.getCurrentUser();
+
+        List<User> followedUsers = currentUser.getFollowing().stream()
+                .map(Subscription::getFollowing)
+                .toList();
+
+        return postRepository.findByUserInAndIsDeletedFalse(followedUsers, pageable);
     }
 
     public Post getPostById(Long id) {

@@ -1,6 +1,8 @@
 package blog.Controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.data.autoconfigure.web.DataWebProperties.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -40,6 +42,18 @@ public class PostController {
     public ResponseEntity<List<PostResponseDto>> getAllPosts(@RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         List<Post> posts = postService.getAllPosts(page, size);
+        List<PostResponseDto> postDtos = new ArrayList<>();
+        for (Post post : posts) {
+            postDtos.add(PostResponseDto.from(post, userService.postLikedByUser(post.getId())));
+        }
+
+        return ResponseEntity.ok(postDtos);
+    }
+
+    @GetMapping("/followed")
+    public ResponseEntity<List<PostResponseDto>> getByFollowedUsers(
+            @PageableDefault(size = 10) Pageable pageable) {
+        List<Post> posts = postService.getByFollowedUsers(pageable).toList();
         List<PostResponseDto> postDtos = new ArrayList<>();
         for (Post post : posts) {
             postDtos.add(PostResponseDto.from(post, userService.postLikedByUser(post.getId())));
