@@ -15,6 +15,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     Page<Post> findByIsDeletedFalse(Pageable pageable);
 
-    Page<Post> findByUserInAndIsDeletedFalse(List<User> users, org.springframework.boot.data.autoconfigure.web.DataWebProperties.Pageable pageable);
+    Page<Post> findByUserInAndIsDeletedFalse(List<User> users, Pageable pageable);
 
 }
