@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import blog.Model.User;
 import blog.Repositories.LikeRepository;
+import blog.Repositories.SubscriptionRepository;
 import blog.Repositories.UserRepository;
 import blog.Dto.UserDto;
 import blog.Model.Post;
@@ -19,6 +20,8 @@ public class UserService {
     private UserRepository userRepository;
     @Autowired
     private LikeRepository likeRepository;
+    @Autowired
+    private SubscriptionRepository subscriptionRepository;
 
     public boolean postLikedByUser(Long postId) {
         return likeRepository.existsByPostIdAndUserId(postId, getCurrentUser().getId());
@@ -58,6 +61,15 @@ public class UserService {
         user.setBio(updatedUser.getBio());
         user.setAvatarUrl(updatedUser.getAvatar());
         return userRepository.save(user);
+    }
+
+    public boolean checkFollow(Long id) {
+        User current = getCurrentUser();
+        User toFollow = getUserById(id);
+        if (subscriptionRepository.existsByFollowerAndFollowing(current, toFollow)) {
+            return true;
+        }
+        return false;
     }
 
     // public void subscribe(Long id) {

@@ -28,7 +28,7 @@ public class UserController {
         for (Post post : posts) {
             postDtos.add(PostResponseDto.from(post, userService.postLikedByUser(post.getId())));
         }
-        return ResponseEntity.ok(UserProfile.from(userService.getUserById(id), postDtos, false,
+        return ResponseEntity.ok(UserProfile.from(userService.getUserById(id), postDtos, userService.checkFollow(id),
                 userService.getCurrentUser().getId() == id));
     }
 

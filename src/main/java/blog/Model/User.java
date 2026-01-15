@@ -46,13 +46,11 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Post> posts;
 
-    @ManyToOne
-    @JoinColumn(name = "follower_id")
-    private List<User> follower;
+    @OneToMany(mappedBy = "following")
+    private List<Subscription> followers;
 
-    @ManyToOne
-    @JoinColumn(name = "following_id")
-    private List<User> following;
+    @OneToMany(mappedBy = "follower")
+    private List<Subscription> following;
 
     @PrePersist
     protected void onCreate() {
@@ -62,5 +60,17 @@ public class User {
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
+    }
+
+    public List<User> getAllFollowers() {
+        return following.stream()
+                .map(Subscription::getFollower)
+                .toList();
+    }
+
+    public List<User> getAllFollowingUsers() {
+        return following.stream()
+                .map(Subscription::getFollowing)
+                .toList();
     }
 }

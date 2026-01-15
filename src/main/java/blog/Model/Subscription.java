@@ -3,15 +3,14 @@ package blog.Model;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
-@Table(name = "subscriptions", uniqueConstraints = @UniqueConstraint(columnNames = { "follower_id", "following_id" }))
+@Table(name = "_follow", uniqueConstraints = @UniqueConstraint(columnNames = { "follower_id", "following_id" }))
 @Data
-@RequiredArgsConstructor
+@NoArgsConstructor
 @AllArgsConstructor
 public class Subscription {
 
@@ -19,13 +18,15 @@ public class Subscription {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "follower_id")
-    private List<User> follower;
+    // User who follows
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "follower_id", nullable = false)
+    private User follower;
 
-    @ManyToOne
-    @JoinColumn(name = "following_id")
-    private List<User> following;
+    // User being followed
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "following_id", nullable = false)
+    private User following;
 
     private LocalDateTime createdAt;
 
