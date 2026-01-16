@@ -12,6 +12,7 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class PostResponseDto {
+    private Long id;
     private String content;
     private PostAuthor author;
     private int likes;
@@ -22,7 +23,7 @@ public class PostResponseDto {
         User user = post.getUser();
         List<Comment> postComments = post.getComments();
         if (postComments == null) {
-            return new PostResponseDto(post.getContent(), PostAuthor.from(user), post.getLikes().size(),
+            return new PostResponseDto(post.getId(), post.getContent(), PostAuthor.from(user), post.getLikes().size(),
                     likedByCurrentUser, List.of());
         }
         List<CommentResponseDto> comments = postComments.stream()
@@ -32,6 +33,7 @@ public class PostResponseDto {
         if (post.getLikes() != null) {
             likesCount = post.getLikes().size();
         }
-        return new PostResponseDto(post.getContent(), PostAuthor.from(user), likesCount, likedByCurrentUser, comments);
+        return new PostResponseDto(post.getId(), post.getContent(), PostAuthor.from(user), likesCount,
+                likedByCurrentUser, comments);
     }
 }
