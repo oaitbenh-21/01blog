@@ -24,7 +24,7 @@ public class BlogApplication {
 			UserRepository repository,
 			PasswordEncoder passwordEncoder) { // Inject as parameter, not field
 		return args -> {
-			var admin = new User();
+			User admin = new User();
 			admin.setUsername("oaitbenh");
 			admin.setEmail("0xmrrandom@gmail.com");
 			admin.setPassword(passwordEncoder.encode("admin123")); // Use parameter
