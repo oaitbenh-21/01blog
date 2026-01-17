@@ -8,6 +8,7 @@ import blog.Dto.PostResponseDto;
 import blog.Dto.UserDto;
 import blog.Dto.UserProfile;
 import blog.Model.Post;
+import blog.Model.User;
 import blog.Services.UserService;
 
 import java.util.ArrayList;
@@ -32,6 +33,13 @@ public class UserController {
                 userService.getCurrentUser().getId() == id));
     }
 
+    // Get current user data
+    @GetMapping("/me")
+    public ResponseEntity<UserDto> getMine() {
+        User user = userService.getCurrentUser();
+        return ResponseEntity.ok(UserDto.from(user));
+    }
+
     // Update current user profile
     @PutMapping("/me")
     public ResponseEntity<UserDto> updateProfile(@RequestBody UserDto updatedUser) { // i should to edit requestbody to
@@ -39,11 +47,7 @@ public class UserController {
         if (updatedUser.getId() == null || (updatedUser.getId() != userService.getCurrentUser().getId())) {
             throw new RuntimeException("User ID is required for update");
         }
-        List<Post> posts = userService.getPostsByUserId(userService.UpdateProfile(updatedUser).getId());
-        List<PostResponseDto> postDtos = new ArrayList<>();
-        for (Post post : posts) {
-            postDtos.add(PostResponseDto.from(post, userService.postLikedByUser(post.getId())));
-        }
+        updatedUser = userService.updateProfile(updatedUser);
         return ResponseEntity.ok(updatedUser);
     }
 
