@@ -42,7 +42,7 @@ public class UserService {
         return user.getPosts();
     }
 
-    public User UpdateProfile(UserDto updatedUser) {
+    public UserDto updateProfile(UserDto updatedUser) {
         User user = getCurrentUser();
         if (!user.getId().equals(updatedUser.getId())) {
             throw new RuntimeException("Cannot update another user's profile");
@@ -61,7 +61,8 @@ public class UserService {
         }
         user.setBio(updatedUser.getBio());
         user.setAvatarUrl(updatedUser.getAvatar());
-        return userRepository.save(user);
+        userRepository.save(user);
+        return updatedUser;
     }
 
     public boolean checkFollow(Long id) {
