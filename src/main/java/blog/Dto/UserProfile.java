@@ -17,6 +17,11 @@ public class UserProfile {
     private boolean follow;
     private boolean isMine;
     private List<PostResponseDto> posts;
+    private String avatar;
+    private String CDate;
+    private boolean isBanned;
+    private int followersCount;
+    private int followingCount;
 
     public static UserProfile from(User user, List<PostResponseDto> posts, boolean follow, boolean isMine) {
         return UserProfile.builder()
@@ -28,6 +33,11 @@ public class UserProfile {
                 .posts(posts)
                 .follow(follow)
                 .isMine(isMine)
+                .avatar(user.getAvatarUrl())
+                .CDate(user.getCreatedAt().toString())
+                .isBanned(user.isBanned())
+                .followersCount(user.getFollowers().size())
+                .followingCount(user.getFollowing().size())
                 .build();
     }
 
