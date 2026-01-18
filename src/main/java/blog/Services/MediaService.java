@@ -32,6 +32,13 @@ public class MediaService {
         if (parts.length != 2) {
             throw new IllegalArgumentException("Invalid data URL.");
         }
+        System.out.println();
+        System.out.println();
+        System.out.println();
+        System.out.println();
+        System.out.println();
+        System.out.println();
+        System.out.println();
         String base64String = parts[1];
         byte[] fileBytes = Base64.getDecoder().decode(base64String);
         String fileType = this.getMimeType(fileBytes);
@@ -48,6 +55,18 @@ public class MediaService {
             default -> throw new IllegalArgumentException("Unsupported file type: " + fileType + ext);
         }
         this.saveMedia(post, outputPath + ext);
+        System.out.println(outputPath + ext);
+        System.out.println();
+        System.out.println();
+        System.out.println();
+        System.out.println();
+        System.out.println();
+        System.out.println();
+        System.out.println();
+        System.out.println();
+        System.out.println();
+        System.out.println();
+
         try (FileOutputStream fos = new FileOutputStream(new File(outputPath + ext))) {
             fos.write(fileBytes);
         }

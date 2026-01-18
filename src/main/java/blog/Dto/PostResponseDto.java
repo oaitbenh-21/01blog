@@ -26,8 +26,10 @@ public class PostResponseDto {
         User user = post.getUser();
         List<Comment> postComments = post.getComments();
         List<String> files = List.of();
-        for (var media : post.getMedia()) {
-            files.add(media.getUrl());
+        if (post.getMedia() != null) {
+            for (var media : post.getMedia()) {
+                files.add(media.getUrl());
+            }
         }
         if (postComments == null) {
             return new PostResponseDto(post.getId(), post.getContent(), PostAuthor.from(user), post.getLikes().size(),
