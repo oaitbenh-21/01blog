@@ -18,13 +18,14 @@ public class PostResponseDto {
     private int likes;
     private boolean likedByCurrentUser;
     private List<CommentResponseDto> comments;
+    private String CDate;
 
     public static PostResponseDto from(Post post, boolean likedByCurrentUser) {
         User user = post.getUser();
         List<Comment> postComments = post.getComments();
         if (postComments == null) {
             return new PostResponseDto(post.getId(), post.getContent(), PostAuthor.from(user), post.getLikes().size(),
-                    likedByCurrentUser, List.of());
+                    likedByCurrentUser, List.of(), post.getCreatedAt().toString());
         }
         List<CommentResponseDto> comments = postComments.stream()
                 .map(CommentResponseDto::from)
@@ -34,6 +35,6 @@ public class PostResponseDto {
             likesCount = post.getLikes().size();
         }
         return new PostResponseDto(post.getId(), post.getContent(), PostAuthor.from(user), likesCount,
-                likedByCurrentUser, comments);
+                likedByCurrentUser, comments, post.getCreatedAt().toString());
     }
 }
