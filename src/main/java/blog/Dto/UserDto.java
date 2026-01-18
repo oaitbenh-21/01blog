@@ -13,9 +13,11 @@ public class UserDto {
     private String email;
     private String bio;
     private String role;
+    private String CDate;
+    private boolean isBanned;
 
     public static UserDto from(User user) {
         return new UserDto(user.getId(), user.getUsername(), user.getAvatarUrl(), user.getEmail(), user.getBio(),
-                user.getRole().name());
+                user.getRole().name(), user.getCreatedAt().toString(), user.isBanned());
     }
 }
