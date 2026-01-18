@@ -1,46 +1,61 @@
 package blog.Services;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
-import org.springframework.web.multipart.MultipartFile;
 
+import blog.Model.Media;
+import blog.Model.Post;
+import blog.Repositories.MediaRepository;
+import lombok.RequiredArgsConstructor;
+
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Base64;
 
 @Service
+@RequiredArgsConstructor
 public class MediaService {
-
-    // Directory to save uploaded files
+    @Autowired
+    private MediaRepository mediaRepository;
     @Value("${media.upload.dir:uploads}")
     private String uploadDir;
 
-    /**
-     * Save the uploaded file and return its accessible URL/path.
-     */
-    public String uploadFile(MultipartFile file) {
-        try {
-            // Ensure the uploads directory exists
-            Path uploadPath = Paths.get(uploadDir);
-            if (!Files.exists(uploadPath)) {
-                Files.createDirectories(uploadPath);
+    public void saveBase64File(Post post, String dataUrl, String outputPath) throws Exception {
+        String[] parts = dataUrl.split(",");
+        if (parts.length != 2) {
+            throw new IllegalArgumentException("Invalid data URL.");
+        }
+        String base64String = parts[1];
+        byte[] fileBytes = Base64.getDecoder().decode(base64String);
+        String fileType = this.getMimeType(fileBytes);
+        if (fileType == null) {
+            throw new IllegalArgumentException("Could not determine file type.");
+        }
+        String ext = ".mp4";
+        switch (fileType) {
+            case "image/png", "image/jpeg", "image/gif" -> {
+                ext = "." + fileType.split("/")[1];
             }
+            case "video/mp4" -> {
+            }
+            default -> throw new IllegalArgumentException("Unsupported file type: " + fileType + ext);
+        }
+        this.saveMedia(post, outputPath + ext);
+        try (FileOutputStream fos = new FileOutputStream(new File(outputPath + ext))) {
+            fos.write(fileBytes);
+        }
+    }
 
-            // Clean file name
-            String originalFilename = StringUtils.cleanPath(file.getOriginalFilename());
-            String filename = System.currentTimeMillis() + "_" + originalFilename;
-
-            // Save the file to the uploads folder
-            Path filePath = uploadPath.resolve(filename);
-            file.transferTo(filePath.toFile());
-
-            // Return relative path or URL
-            return "/media/" + filename;
-
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to store file: " + e.getMessage(), e);
+    public String getMimeType(byte[] fileBytes) throws IOException {
+        try (ByteArrayInputStream bis = new ByteArrayInputStream(fileBytes)) {
+            return URLConnection.guessContentTypeFromStream(bis);
         }
     }
 
@@ -57,6 +72,13 @@ public class MediaService {
         } catch (IOException e) {
             throw new RuntimeException("Failed to read file: " + e.getMessage(), e);
         }
+    }
+
+    public void saveMedia(Post post, String fileUrl) {
+        Media media = new Media();
+        media.setPost(post);
+        media.setUrl(fileUrl);
+        mediaRepository.save(media);
     }
 
     /**

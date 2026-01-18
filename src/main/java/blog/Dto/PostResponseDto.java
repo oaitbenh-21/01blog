@@ -20,13 +20,18 @@ public class PostResponseDto {
     private List<CommentResponseDto> comments;
     private String CDate;
     private String description;
+    private List<String> fileUrl;
 
     public static PostResponseDto from(Post post, boolean likedByCurrentUser) {
         User user = post.getUser();
         List<Comment> postComments = post.getComments();
+        List<String> files = List.of();
+        for (var media : post.getMedia()) {
+            files.add(media.getUrl());
+        }
         if (postComments == null) {
             return new PostResponseDto(post.getId(), post.getContent(), PostAuthor.from(user), post.getLikes().size(),
-                    likedByCurrentUser, List.of(), post.getCreatedAt().toString(), post.getDescription());
+                    likedByCurrentUser, List.of(), post.getCreatedAt().toString(), post.getDescription(), files);
         }
         List<CommentResponseDto> comments = postComments.stream()
                 .map(CommentResponseDto::from)
@@ -36,6 +41,6 @@ public class PostResponseDto {
             likesCount = post.getLikes().size();
         }
         return new PostResponseDto(post.getId(), post.getContent(), PostAuthor.from(user), likesCount,
-                likedByCurrentUser, comments, post.getCreatedAt().toString(), post.getDescription());
+                likedByCurrentUser, comments, post.getCreatedAt().toString(), post.getDescription(), files);
     }
 }
