@@ -1,7 +1,7 @@
 package blog.Services;
 
+import blog.Model.enums.MediaType;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import blog.Model.Media;
@@ -24,8 +24,7 @@ import java.util.Base64;
 public class MediaService {
     @Autowired
     private MediaRepository mediaRepository;
-    @Value("${media.upload.dir:uploads}")
-    private String uploadDir;
+    private String uploadDir = "src/main/resources/static/";
 
     public void saveBase64File(Post post, String dataUrl, String outputPath) throws Exception {
         String[] parts = dataUrl.split(",");
@@ -46,15 +45,20 @@ public class MediaService {
             throw new IllegalArgumentException("Could not determine file type.");
         }
         String ext = ".mp4";
+        MediaType mediaType;
         switch (fileType) {
             case "image/png", "image/jpeg", "image/gif" -> {
                 ext = "." + fileType.split("/")[1];
+                mediaType = MediaType.IMAGE;
             }
             case "video/mp4" -> {
+                mediaType = MediaType.VIDEO;
             }
             default -> throw new IllegalArgumentException("Unsupported file type: " + fileType + ext);
         }
-        this.saveMedia(post, outputPath + ext);
+
+        System.out.println(outputPath + ext);
+        this.saveMedia(post, outputPath + ext, mediaType);
         System.out.println(outputPath + ext);
         System.out.println();
         System.out.println();
@@ -67,7 +71,7 @@ public class MediaService {
         System.out.println();
         System.out.println();
 
-        try (FileOutputStream fos = new FileOutputStream(new File(outputPath + ext))) {
+        try (FileOutputStream fos = new FileOutputStream(new File(uploadDir + outputPath + ext))) {
             fos.write(fileBytes);
         }
     }
@@ -93,8 +97,9 @@ public class MediaService {
         }
     }
 
-    public void saveMedia(Post post, String fileUrl) {
+    public void saveMedia(Post post, String fileUrl, MediaType mediaType) {
         Media media = new Media();
+        media.setType(mediaType);
         media.setPost(post);
         media.setUrl(fileUrl);
         mediaRepository.save(media);

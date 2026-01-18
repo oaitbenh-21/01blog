@@ -1,5 +1,6 @@
 package blog.Dto;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,12 +26,13 @@ public class PostResponseDto {
     public static PostResponseDto from(Post post, boolean likedByCurrentUser) {
         User user = post.getUser();
         List<Comment> postComments = post.getComments();
-        List<String> files = List.of();
+        List<String> files = new ArrayList<>();
         if (post.getMedia() != null) {
             for (var media : post.getMedia()) {
                 files.add(media.getUrl());
             }
         }
+
         if (postComments == null) {
             return new PostResponseDto(post.getId(), post.getContent(), PostAuthor.from(user), post.getLikes().size(),
                     likedByCurrentUser, List.of(), post.getCreatedAt().toString(), post.getDescription(), files);

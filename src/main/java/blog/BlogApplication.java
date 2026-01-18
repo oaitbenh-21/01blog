@@ -25,6 +25,9 @@ public class BlogApplication {
 			PasswordEncoder passwordEncoder) { // Inject as parameter, not field
 		return args -> {
 			User admin = new User();
+			repository.findByUsername("oaitbenh").ifPresent(existingUser -> {
+				return;
+			});
 			admin.setUsername("oaitbenh");
 			admin.setEmail("0xmrrandom@gmail.com");
 			admin.setPassword(passwordEncoder.encode("admin123")); // Use parameter

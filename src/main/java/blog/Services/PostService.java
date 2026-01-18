@@ -15,6 +15,7 @@ import blog.Repositories.CommentRepository;
 import blog.Repositories.LikeRepository;
 import blog.Repositories.PostRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -38,12 +39,6 @@ public class PostService {
     public Post createPost(PostDto postDto) {
         User user = userService.getCurrentUser();
         Post post = new Post();
-        String fileUrl = "public/uploads/" + System.currentTimeMillis() + UUID.randomUUID().toString();
-        try {
-            mediaService.saveBase64File(post, postDto.getFile(), fileUrl);
-        } catch (Exception e) {
-            System.out.println("File saving error: " + e.getMessage());
-        }
         post.setUser(user);
         post.setContent(postDto.getContent());
         post.setDescription(postDto.getDescription());
@@ -52,11 +47,19 @@ public class PostService {
         List<Comment> comments = List.of();
         post.setComments(comments);
         post = postRepository.save(post);
+        String fileUrl = "media/" + System.currentTimeMillis() + UUID.randomUUID().toString();
+        try {
+            mediaService.saveBase64File(post, postDto.getFile(), fileUrl);
+        } catch (Exception e) {
+            System.out.println("File saving error: " + e.getMessage());
+        }
         return post;
     }
 
     public List<Post> getAllPosts(int page, int size) {
-        return postRepository.findByIsDeletedFalse(PageRequest.of(page, size)).toList();
+        List<Post> posts = new ArrayList<>(
+                postRepository.findByIsDeletedFalse(PageRequest.of(page, size)).getContent());
+        return posts;
     }
 
     // public Page<Post> getByFollowedUsers(Pageable pageable) {
