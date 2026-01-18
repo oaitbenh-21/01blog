@@ -32,6 +32,8 @@ public class Post {
     private List<Like> likes;
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Comment> comments;
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Media> media;
 
     @PrePersist
     protected void onCreate() {

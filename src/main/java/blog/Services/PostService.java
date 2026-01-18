@@ -16,6 +16,7 @@ import blog.Repositories.LikeRepository;
 import blog.Repositories.PostRepository;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class PostService {
@@ -31,10 +32,18 @@ public class PostService {
 
     @Autowired
     private LikeRepository likeRepository;
+    @Autowired
+    private MediaService mediaService;
 
     public Post createPost(PostDto postDto) {
         User user = userService.getCurrentUser();
         Post post = new Post();
+        String fileUrl = "public/uploads/" + System.currentTimeMillis() + UUID.randomUUID().toString();
+        try {
+            mediaService.saveBase64File(post, postDto.getFile(), fileUrl);
+        } catch (Exception e) {
+            System.out.println("File saving error: " + e.getMessage());
+        }
         post.setUser(user);
         post.setContent(postDto.getContent());
         post.setDescription(postDto.getDescription());
