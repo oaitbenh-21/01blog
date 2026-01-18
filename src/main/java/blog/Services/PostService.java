@@ -47,6 +47,7 @@ public class PostService {
         Post post = new Post();
         post.setUser(user);
         post.setContent(postDto.getContent());
+        post.setDescription(postDto.getDescription());
         List<Like> likes = List.of();
         post.setLikes(likes);
         List<Comment> comments = List.of();
@@ -106,14 +107,14 @@ public class PostService {
     }
 
     // public Page<Post> getByFollowedUsers(Pageable pageable) {
-    //     User currentUser = userService.getCurrentUser();
+    // User currentUser = userService.getCurrentUser();
 
-    //     // Map subscriptions to the users being followed
-    //     List<User> followedUsers = currentUser.getFollowing().stream()
-    //             .map(sub -> sub.getFollowing())
-    //             .toList();
+    // // Map subscriptions to the users being followed
+    // List<User> followedUsers = currentUser.getFollowing().stream()
+    // .map(sub -> sub.getFollowing())
+    // .toList();
 
-    //     return postRepository.findByUserInAndIsDeletedFalse(followedUsers, pageable);
+    // return postRepository.findByUserInAndIsDeletedFalse(followedUsers, pageable);
     // }
 
     public Post getPostById(Long id) {
@@ -129,6 +130,7 @@ public class PostService {
             throw new RuntimeException("Unauthorized");
         }
         post.setContent(postDto.getContent());
+        post.setDescription(postDto.getDescription());
         Post updated = postRepository.save(post);
         return updated;
     }

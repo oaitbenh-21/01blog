@@ -20,7 +20,9 @@ public class Post {
     private User user;
 
     @Column(nullable = false, columnDefinition = "TEXT")
-    private String content; // Markdown content
+    private String content;
+    @Column(nullable = false, columnDefinition = "TEXT")
+    private String description;
 
     private boolean isDeleted = false;
 
