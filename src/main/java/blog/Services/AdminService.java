@@ -45,6 +45,9 @@ public class AdminService {
     }
 
     public void banUser(Long userid) {
+        if (userid == userService.getCurrentUser().getId()) {
+            throw new RuntimeException("admin cannot ban themselves");
+        }
         User user = userRepository.findById(userid)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         user.setBanned(true);
