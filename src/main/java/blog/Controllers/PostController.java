@@ -5,8 +5,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import blog.Dto.CommentDto;
+import blog.Dto.CommentResponseDto;
 import blog.Dto.PostDto;
 import blog.Dto.PostResponseDto;
+import blog.Model.Comment;
 import blog.Model.Post;
 import blog.Services.PostService;
 import blog.Services.UserService;
@@ -74,10 +76,9 @@ public class PostController {
 
     // Add a comment
     @PostMapping("/{id}/comment")
-    public ResponseEntity<String> addComment(@PathVariable Long id,
+    public ResponseEntity<CommentResponseDto> addComment(@PathVariable Long id,
             @RequestBody CommentDto commentDto) {
-        postService.addComment(id, commentDto);
-        return ResponseEntity.ok("Comment added.");
+        return ResponseEntity.ok(postService.addComment(id, commentDto));
     }
 
     // Delete a comment
