@@ -67,16 +67,16 @@ public class PostService {
         return posts;
     }
 
-    // public Page<Post> getByFollowedUsers(Pageable pageable) {
-    // User currentUser = userService.getCurrentUser();
+    public List<Post> getByFollowedUsers(int page, int size) {
+        User currentUser = userService.getCurrentUser();
+        List<User> followedUsers = currentUser.getFollowing().stream()
+                .map(sub -> sub.getFollowing())
+                .toList();
 
-    // // Map subscriptions to the users being followed
-    // List<User> followedUsers = currentUser.getFollowing().stream()
-    // .map(sub -> sub.getFollowing())
-    // .toList();
-
-    // return postRepository.findByUserInAndIsDeletedFalse(followedUsers, pageable);
-    // }
+        List<Post> posts = new ArrayList<>(
+                postRepository.findByUserInAndIsDeletedFalse(followedUsers, PageRequest.of(page, size)).getContent());
+        return posts;
+    }
 
     public Post getPostById(Long id) {
         return postRepository.findById(id).orElseThrow(() -> new RuntimeException("Post not found"));

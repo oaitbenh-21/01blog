@@ -9,11 +9,11 @@ import jakarta.validation.constraints.Pattern;
 public class PostDto {
 
     @NotBlank(message = "Description is required")
-    @Size(min = 2, max = 300, message = "Description cannot exceed 300 characters")
+    @Size(min = 10, max = 300, message = "Description should be from 10 to 300 characters")
     private String description;
 
     @NotBlank(message = "Content is required")
-    @Size(min = 10, max = 5_000_000, message = "Content cannot exceed 5000 characters")
+    @Size(min = 10, max = 5_000_000, message = "Content should be from 10 to 5000 characters")
     private String content;
 
     @Size(max = 10_000_000, message = "File is too large")
