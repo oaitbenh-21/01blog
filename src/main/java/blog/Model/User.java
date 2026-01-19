@@ -52,6 +52,9 @@ public class User {
     @OneToMany(mappedBy = "follower", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Subscription> following;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Like> likes;
+
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();

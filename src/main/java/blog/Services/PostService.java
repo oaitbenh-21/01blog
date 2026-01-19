@@ -79,6 +79,7 @@ public class PostService {
     }
 
     public Post getPostById(Long id) {
+        System.out.println(id);
         return postRepository.findById(id).orElseThrow(() -> new RuntimeException("Post not found"));
     }
 
