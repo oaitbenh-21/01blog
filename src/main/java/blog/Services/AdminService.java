@@ -77,10 +77,10 @@ public class AdminService {
             analytic.setTotalReports(this.getAllReports().size());
         }
         if (this.getAllPosts() != null) {
-            analytic.setTotalReports(this.getAllPosts().size());
+            analytic.setTotalPosts(this.getAllPosts().size());
         }
         if (this.getAllUsers() != null) {
-            analytic.setTotalReports(this.getAllUsers().size());
+            analytic.setTotalUsers(this.getAllUsers().size());
         }
         return analytic;
     }
