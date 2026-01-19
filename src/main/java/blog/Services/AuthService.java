@@ -25,7 +25,7 @@ public class AuthService {
     private PasswordEncoder passwordEncoder;
 
     @Autowired
-    private JwtService jwtService; // Assume you have JWT util for token generation
+    private JwtService jwtService;
 
     public void register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.getEmail()))

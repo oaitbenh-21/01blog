@@ -11,6 +11,7 @@ import blog.Dto.PostResponseDto;
 import blog.Model.Post;
 import blog.Services.PostService;
 import blog.Services.UserService;
+import jakarta.validation.Valid;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,14 +25,12 @@ public class PostController {
     @Autowired
     private UserService userService;
 
-    // Create a new post
     @PostMapping
-    public ResponseEntity<PostResponseDto> createPost(@RequestBody PostDto postDto) {
+    public ResponseEntity<PostResponseDto> createPost(@RequestBody @Valid PostDto postDto) {
         Post createdPost = postService.createPost(postDto);
         return ResponseEntity.ok(PostResponseDto.from(createdPost, userService.postLikedByUser(createdPost.getId())));
     }
 
-    // Get all posts (feed)
     @GetMapping
     public ResponseEntity<List<PostResponseDto>> getAllPosts(@RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
@@ -44,14 +43,12 @@ public class PostController {
         return ResponseEntity.ok(postDtos);
     }
 
-    // Get post by ID
     @GetMapping("/{id}")
     public ResponseEntity<PostResponseDto> getPostById(@PathVariable Long id) {
         Post post = postService.getPostById(id);
         return ResponseEntity.ok(PostResponseDto.from(post, userService.postLikedByUser(post.getId())));
     }
 
-    // Update post
     @PutMapping("/{id}")
     public ResponseEntity<PostResponseDto> updatePost(@PathVariable Long id,
             @RequestPart("post") PostDto postDto) {
@@ -59,32 +56,28 @@ public class PostController {
         return ResponseEntity.ok(PostResponseDto.from(updatedPost, userService.postLikedByUser(updatedPost.getId())));
     }
 
-    // Soft delete post
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deletePost(@PathVariable Long id) {
+    public ResponseEntity<Void> deletePost(@PathVariable Long id) {
         postService.deletePost(id);
-        return ResponseEntity.ok("Post deleted successfully.");
+        return ResponseEntity.ok().build();
     }
 
-    // Like/unlike a post
     @PostMapping("/{id}/like")
-    public ResponseEntity<String> toggleLike(@PathVariable Long id) {
+    public ResponseEntity<Void> toggleLike(@PathVariable Long id) {
         postService.toggleLike(id);
-        return ResponseEntity.ok("Toggled like on post.");
+        return ResponseEntity.ok().build();
     }
 
-    // Add a comment
     @PostMapping("/{id}/comment")
     public ResponseEntity<CommentResponseDto> addComment(@PathVariable Long id,
-            @RequestBody CommentDto commentDto) {
+            @RequestBody @Valid CommentDto commentDto) {
         return ResponseEntity.ok(postService.addComment(id, commentDto));
     }
 
-    // Delete a comment
     @DeleteMapping("/{postId}/comment/{commentId}")
-    public ResponseEntity<String> deleteComment(@PathVariable Long postId,
+    public ResponseEntity<Void> deleteComment(@PathVariable Long postId,
             @PathVariable Long commentId) {
         postService.deleteComment(postId, commentId);
-        return ResponseEntity.ok("Comment deleted.");
+        return ResponseEntity.ok().build();
     }
 }

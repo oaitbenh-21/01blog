@@ -101,7 +101,7 @@ public class PostService {
         post.setDeleted(true);
         if (userService.getCurrentUser().getId() != post.getUser().getId()
                 && userService.getCurrentUser().getRole() != Role.ADMIN) {
-            throw new RuntimeException("Unauthorized");
+            throw new RuntimeException("You are not allowed to delete this post");
         }
         postRepository.save(post);
     }

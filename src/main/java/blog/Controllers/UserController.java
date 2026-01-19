@@ -5,11 +5,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import blog.Dto.PostResponseDto;
+import blog.Dto.UpdateUserDto;
 import blog.Dto.UserDto;
 import blog.Dto.UserProfile;
 import blog.Model.Post;
 import blog.Model.User;
 import blog.Services.UserService;
+import jakarta.validation.Valid;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +23,6 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    // Get public profile (block page)
     @GetMapping("/{id}")
     public ResponseEntity<UserProfile> getUser(@PathVariable Long id) {
         List<Post> posts = userService.getPostsByUserId(id);
@@ -33,41 +34,33 @@ public class UserController {
                 userService.getCurrentUser().getId() == id));
     }
 
-    // Get current user data
     @GetMapping("/me")
     public ResponseEntity<UserDto> getMine() {
         User user = userService.getCurrentUser();
         return ResponseEntity.ok(UserDto.from(user));
     }
 
-    // Update current user profile
     @PutMapping("/me")
-    public ResponseEntity<UserDto> updateProfile(@RequestBody UserDto updatedUser) { // i should to edit requestbody to
-                                                                                     // UserDto
-        if (updatedUser.getId() == null || (updatedUser.getId() != userService.getCurrentUser().getId())) {
-            throw new RuntimeException("User ID is required for update");
-        }
-        updatedUser = userService.updateProfile(updatedUser);
-        return ResponseEntity.ok(updatedUser);
+    public ResponseEntity<Void> updateProfile(@RequestBody @Valid UpdateUserDto updatedUser) {
+        userService.updateProfile(updatedUser);
+        return ResponseEntity.ok().build();
     }
 
-    // Subscribe to a user
     @PostMapping("/{id}/subscribe")
-    public ResponseEntity<String> subscribe(@PathVariable Long id) {
+    public ResponseEntity<Void> subscribe(@PathVariable Long id) {
         if (id.equals(userService.getCurrentUser().getId())) {
             throw new RuntimeException("Cannot subscribe to yourself");
         }
         userService.subscribe(id);
-        return ResponseEntity.ok("Subscribed successfully.");
+        return ResponseEntity.ok().build();
     }
 
-    // Unsubscribe
     @DeleteMapping("/{id}/unsubscribe")
-    public ResponseEntity<String> unsubscribe(@PathVariable Long id) {
+    public ResponseEntity<Void> unsubscribe(@PathVariable Long id) {
         if (id.equals(userService.getCurrentUser().getId())) {
             throw new RuntimeException("Cannot unsubscribe to yourself");
         }
         userService.unsubscribe(id);
-        return ResponseEntity.ok("Unsubscribed successfully.");
+        return ResponseEntity.ok().build();
     }
 }

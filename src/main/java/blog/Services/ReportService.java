@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import blog.Dto.ReportDto;
+import blog.Dto.ReportRequest;
 import blog.Model.Report;
 import blog.Model.User;
 import blog.Model.enums.ReportStatus;
@@ -20,15 +21,16 @@ public class ReportService {
     @Autowired
     private UserService userService;
 
-    public void submitReport(ReportDto dto) {
+    public void submitReport(ReportRequest dto) {
         User user = userService.getCurrentUser();
-        if (user.getId().equals(dto.getReportedUserId())) {
+        if (user.getId().equals(dto.getUserid())) {
             throw new RuntimeException("Cannot report yourself");
         }
         Report report = new Report();
         report.setReportedBy(user);
-        report.setReportedUser(userService.getUserById(dto.getReportedUserId()));
+        report.setReportedUser(userService.getUserById(dto.getUserid()));
         report.setReason(dto.getReason());
+        report.setStatus(ReportStatus.PENDING);
         reportRepository.save(report);
     }
 
@@ -46,7 +48,7 @@ public class ReportService {
                 }).toList();
     }
 
-    public void resolveReport(Long id, String action) {
+    public void resolveReport(Long id) {
         Report report = reportRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Report not found"));
         report.setStatus(ReportStatus.RESOLVED);

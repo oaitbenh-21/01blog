@@ -19,4 +19,5 @@ public class PostDto {
     @Size(max = 10_000_000, message = "File is too large")
     @Pattern(regexp = "^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$", message = "File content must be valid Base64")
     private String file;
+
 }
