@@ -5,6 +5,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import blog.Dto.CommentDto;
+import blog.Dto.CommentResponseDto;
 import blog.Dto.PostDto;
 import blog.Model.Comment;
 import blog.Model.Like;
@@ -47,11 +48,15 @@ public class PostService {
         List<Comment> comments = List.of();
         post.setComments(comments);
         post = postRepository.save(post);
-        String fileUrl = "media/" + System.currentTimeMillis() + UUID.randomUUID().toString();
+        if (postDto.getFile() == null || postDto.getFile().isBlank()) {
+            return post;
+        }
         try {
+            String fileUrl = "media/" + System.currentTimeMillis() + UUID.randomUUID().toString();
             mediaService.saveBase64File(post, postDto.getFile(), fileUrl);
         } catch (Exception e) {
-            System.out.println("File saving error: " + e.getMessage());
+            postRepository.delete(post);
+            throw new RuntimeException("Failed to save media file");
         }
         return post;
     }
@@ -116,14 +121,16 @@ public class PostService {
         }
     }
 
-    public void addComment(Long postId, CommentDto commentDto) {
+    public CommentResponseDto addComment(Long postId, CommentDto commentDto) {
         Post post = getPostById(postId);
         User user = userService.getCurrentUser();
         Comment comment = new Comment();
         comment.setPost(post);
         comment.setUser(user);
         comment.setContent(commentDto.getContent());
-        commentRepository.save(comment);
+        comment = commentRepository.save(comment);
+        CommentResponseDto res = CommentResponseDto.from(comment);
+        return res;
     }
 
     public void deleteComment(Long postId, Long commentId) {
