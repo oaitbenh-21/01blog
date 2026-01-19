@@ -8,7 +8,6 @@ import blog.Dto.CommentDto;
 import blog.Dto.CommentResponseDto;
 import blog.Dto.PostDto;
 import blog.Dto.PostResponseDto;
-import blog.Model.Comment;
 import blog.Model.Post;
 import blog.Services.PostService;
 import blog.Services.UserService;
