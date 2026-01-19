@@ -3,6 +3,8 @@ package blog.Controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import blog.Dto.AnalyticsDto;
 import blog.Dto.ReportDto;
 import blog.Dto.UserDto;
 import blog.Model.Post;
@@ -10,7 +12,6 @@ import blog.Model.User;
 import blog.Services.AdminService;
 
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -42,30 +43,35 @@ public class AdminController {
     @DeleteMapping("/users/{id}")
     public ResponseEntity<String> deleteUser(@PathVariable Long id) {
         adminService.deleteUser(id);
-        return ResponseEntity.ok("User deleted successfully.");
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/users/{id}/ban")
+    public ResponseEntity<String> banUser(@PathVariable Long id) {
+        adminService.banUser(id);
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/posts/{id}")
-    public ResponseEntity<String> deletePost(@PathVariable Long id) {
+    public ResponseEntity<Void> deletePost(@PathVariable Long id) {
         adminService.deletePost(id);
-        return ResponseEntity.ok("Post deleted successfully.");
+        return ResponseEntity.ok().build();
     }
 
-        @DeleteMapping("/comment/{id}")
-    public ResponseEntity<String> deleteComment(@PathVariable Long id) {
+    @DeleteMapping("/comment/{id}")
+    public ResponseEntity<Void> deleteComment(@PathVariable Long id) {
         adminService.deleteComment(id);
-        return ResponseEntity.ok("Post deleted successfully.");
+        return ResponseEntity.ok().build();
     }
-
 
     @PostMapping("/reports/{id}/resolve")
-    public ResponseEntity<String> resolveReport(@PathVariable Long id, @RequestBody String action) {
-        adminService.resolveReport(id, action);
-        return ResponseEntity.ok("Report resolved.");
+    public ResponseEntity<Void> resolveReport(@PathVariable Long id) {
+        adminService.resolveReport(id);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/analytics")
-    public ResponseEntity<Map<String, Object>> getAnalytics() {
+    public ResponseEntity<AnalyticsDto> getAnalytics() {
         return ResponseEntity.ok(adminService.getAnalytics());
     }
 }

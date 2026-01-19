@@ -1,7 +1,9 @@
 package blog.Services;
 
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
+import blog.Dto.AnalyticsDto;
 import blog.Dto.ReportDto;
 import blog.Model.Post;
 import blog.Model.User;
@@ -10,9 +12,9 @@ import blog.Repositories.PostRepository;
 import blog.Repositories.UserRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class AdminService {
@@ -42,6 +44,13 @@ public class AdminService {
         return reportService.getAllReports();
     }
 
+    public void banUser(Long userid) {
+        User user = userRepository.findById(userid)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        user.setBanned(true);
+        userRepository.save(user);
+    }
+
     public void deleteUser(Long id) {
         if (userService.getCurrentUser().getId().equals(id)) {
             throw new RuntimeException("admin cannot delete themselves");
@@ -53,8 +62,8 @@ public class AdminService {
         postRepository.deleteById(id);
     }
 
-    public void resolveReport(Long id, String action) {
-        reportService.resolveReport(id, action);
+    public void resolveReport(Long id) {
+        reportService.resolveReport(id);
     }
 
     public void deleteComment(Long id) {
@@ -62,9 +71,17 @@ public class AdminService {
                 .delete(commentRepository.findById(id).orElseThrow(() -> new RuntimeException("Comment not found")));
     }
 
-    public Map<String, Object> getAnalytics() {
-        return Map.of(
-                "totalUsers", userRepository.count(),
-                "totalPosts", postRepository.count());
+    public AnalyticsDto getAnalytics() {
+        AnalyticsDto analytic = new AnalyticsDto();
+        if (this.getAllReports() != null) {
+            analytic.setTotalReports(this.getAllReports().size());
+        }
+        if (this.getAllPosts() != null) {
+            analytic.setTotalReports(this.getAllPosts().size());
+        }
+        if (this.getAllUsers() != null) {
+            analytic.setTotalReports(this.getAllUsers().size());
+        }
+        return analytic;
     }
 }

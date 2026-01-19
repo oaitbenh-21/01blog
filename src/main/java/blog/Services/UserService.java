@@ -8,7 +8,7 @@ import blog.Model.User;
 import blog.Repositories.LikeRepository;
 import blog.Repositories.SubscriptionRepository;
 import blog.Repositories.UserRepository;
-import blog.Dto.UserDto;
+import blog.Dto.UpdateUserDto;
 import blog.Model.Post;
 import blog.Model.Subscription;
 
@@ -42,27 +42,19 @@ public class UserService {
         return user.getPosts();
     }
 
-    public UserDto updateProfile(UserDto updatedUser) {
+    public void updateProfile(UpdateUserDto updatedUser) {
         User user = getCurrentUser();
-        if (!user.getId().equals(updatedUser.getId())) {
-            throw new RuntimeException("Cannot update another user's profile");
+        if (userRepository.existsByEmail(updatedUser.getEmail())) {
+            throw new RuntimeException("Email already in use");
         }
-        if (updatedUser.getEmail() != null && !updatedUser.getEmail().equals(user.getEmail())) {
-            if (userRepository.existsByEmail(updatedUser.getEmail())) {
-                throw new RuntimeException("Email already in use");
-            }
-            user.setEmail(updatedUser.getEmail());
+        user.setEmail(updatedUser.getEmail());
+        if (userRepository.existsByUsername(updatedUser.getUsername())) {
+            throw new RuntimeException("Username already in use");
         }
-        if (updatedUser.getUsername() != null && !updatedUser.getUsername().equals(user.getUsername())) {
-            if (userRepository.existsByUsername(updatedUser.getUsername())) {
-                throw new RuntimeException("Username already in use");
-            }
-            user.setUsername(updatedUser.getUsername());
-        }
+        user.setUsername(updatedUser.getUsername());
         user.setBio(updatedUser.getBio());
         user.setAvatarUrl(updatedUser.getAvatar());
         userRepository.save(user);
-        return updatedUser;
     }
 
     public boolean checkFollow(Long id) {

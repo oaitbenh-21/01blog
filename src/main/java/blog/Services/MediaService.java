@@ -14,9 +14,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URLConnection;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Base64;
 
 @Service
@@ -31,13 +28,6 @@ public class MediaService {
         if (parts.length != 2) {
             throw new IllegalArgumentException("Invalid data URL.");
         }
-        System.out.println();
-        System.out.println();
-        System.out.println();
-        System.out.println();
-        System.out.println();
-        System.out.println();
-        System.out.println();
         String base64String = parts[1];
         byte[] fileBytes = Base64.getDecoder().decode(base64String);
         String fileType = this.getMimeType(fileBytes);
@@ -57,20 +47,7 @@ public class MediaService {
             default -> throw new IllegalArgumentException("Unsupported file type: " + fileType + ext);
         }
 
-        System.out.println(outputPath + ext);
         this.saveMedia(post, outputPath + ext, mediaType);
-        System.out.println(outputPath + ext);
-        System.out.println();
-        System.out.println();
-        System.out.println();
-        System.out.println();
-        System.out.println();
-        System.out.println();
-        System.out.println();
-        System.out.println();
-        System.out.println();
-        System.out.println();
-
         try (FileOutputStream fos = new FileOutputStream(new File(uploadDir + outputPath + ext))) {
             fos.write(fileBytes);
         }
@@ -82,21 +59,6 @@ public class MediaService {
         }
     }
 
-    /**
-     * Retrieve a file as a byte array.
-     */
-    public byte[] getFile(String filename) {
-        try {
-            Path filePath = Paths.get(uploadDir).resolve(filename);
-            if (!Files.exists(filePath)) {
-                throw new RuntimeException("File not found: " + filename);
-            }
-            return Files.readAllBytes(filePath);
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to read file: " + e.getMessage(), e);
-        }
-    }
-
     public void saveMedia(Post post, String fileUrl, MediaType mediaType) {
         Media media = new Media();
         media.setType(mediaType);
@@ -105,15 +67,4 @@ public class MediaService {
         mediaRepository.save(media);
     }
 
-    /**
-     * Optional: Delete a file
-     */
-    public void deleteFile(String filename) {
-        Path filePath = Paths.get(uploadDir).resolve(filename);
-        try {
-            Files.deleteIfExists(filePath);
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to delete file: " + filename, e);
-        }
-    }
 }
