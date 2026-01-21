@@ -17,12 +17,16 @@ public class Report {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "reported_user_id")
-    private User reportedUser;
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @ManyToOne
-    @JoinColumn(name = "reported_by_id")
-    private User reportedBy;
+    @JoinColumn(name = "post_id")
+    private Post post;
+
+    @ManyToOne
+    @JoinColumn(name = "reporterid")
+    private User reporter;
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String reason;
