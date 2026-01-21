@@ -20,15 +20,27 @@ public class ReportService {
 
     @Autowired
     private UserService userService;
+    @Autowired
+    private PostService postService;
 
-    public void submitReport(ReportRequest dto) {
+    public void reportUser(ReportRequest dto) {
         User user = userService.getCurrentUser();
         if (user.getId().equals(dto.getUserid())) {
             throw new RuntimeException("Cannot report yourself");
         }
         Report report = new Report();
-        report.setReportedBy(user);
-        report.setReportedUser(userService.getUserById(dto.getUserid()));
+        report.setReporter(user);
+        report.setUser(userService.getUserById(dto.getUserid()));
+        report.setReason(dto.getReason());
+        report.setStatus(ReportStatus.PENDING);
+        reportRepository.save(report);
+    }
+
+    public void reportPost(ReportRequest dto) {
+        User user = userService.getCurrentUser();
+        Report report = new Report();
+        report.setReporter(user);
+        report.setPost(postService.getPostById(dto.getPostid()));
         report.setReason(dto.getReason());
         report.setStatus(ReportStatus.PENDING);
         reportRepository.save(report);
@@ -39,8 +51,9 @@ public class ReportService {
                 .stream().map(r -> {
                     ReportDto dto = new ReportDto();
                     dto.setId(r.getId());
-                    dto.setReporterId(r.getReportedBy().getId());
-                    dto.setReportedUserId(r.getReportedUser().getId());
+                    dto.setReporterId(r.getReporter().getId());
+                    dto.setUserId(r.getUser().getId());
+                    dto.setPostId(r.getPost().getId());
                     dto.setReason(r.getReason());
                     dto.setCreatedAt(r.getCreatedAt());
                     dto.setStatus(r.getStatus().name());

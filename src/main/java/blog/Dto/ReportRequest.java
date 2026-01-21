@@ -10,6 +10,8 @@ public class ReportRequest {
 
     @NotNull(message = "User ID is required")
     private Long userid;
+    @NotNull(message = "User ID is required")
+    private Long postid;
 
     @NotBlank(message = "Reason is required")
     @Size(max = 500, message = "Reason cannot exceed 500 characters")

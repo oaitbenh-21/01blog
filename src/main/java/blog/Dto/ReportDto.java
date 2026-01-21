@@ -8,7 +8,8 @@ import java.time.LocalDateTime;
 public class ReportDto {
     private Long id;
     private Long reporterId;
-    private Long reportedUserId;
+    private Long userId;
+    private Long postId;
     private String reason;
     private LocalDateTime createdAt;
     private String status;
