@@ -9,6 +9,7 @@ import blog.Model.Post;
 import blog.Model.User;
 import blog.Repositories.CommentRepository;
 import blog.Repositories.PostRepository;
+import blog.Repositories.ReportRepository;
 import blog.Repositories.UserRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,8 @@ public class AdminService {
 
     @Autowired
     private ReportService reportService;
+    @Autowired
+    private ReportRepository reportRepository;
     @Autowired
     private CommentRepository commentRepository;
 
@@ -67,6 +70,10 @@ public class AdminService {
 
     public void resolveReport(Long id) {
         reportService.resolveReport(id);
+    }
+
+    public void removeReport(Long id) {
+        reportRepository.deleteById(id);
     }
 
     public void deleteComment(Long id) {
