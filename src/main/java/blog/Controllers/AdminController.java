@@ -64,9 +64,15 @@ public class AdminController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/reports/{id}/resolve")
+    @PostMapping("/reports/{id}")
     public ResponseEntity<Void> resolveReport(@PathVariable Long id) {
         adminService.resolveReport(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/reports/{id}")
+    public ResponseEntity<Void> removeReport(@PathVariable Long id) {
+        adminService.removeReport(id);
         return ResponseEntity.ok().build();
     }
 
