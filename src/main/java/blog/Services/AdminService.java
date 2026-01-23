@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import blog.Dto.AnalyticsDto;
+import blog.Dto.PostResponseDto;
 import blog.Dto.ReportDto;
 import blog.Model.Post;
 import blog.Model.User;
@@ -15,6 +16,7 @@ import blog.Repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -29,6 +31,9 @@ public class AdminService {
     private PostRepository postRepository;
 
     @Autowired
+    private PostService postService;
+
+    @Autowired
     private ReportService reportService;
     @Autowired
     private ReportRepository reportRepository;
@@ -39,12 +44,21 @@ public class AdminService {
         return userRepository.findAll();
     }
 
-    public List<Post> getAllPosts() {
-        return postRepository.findAll();
+    public List<PostResponseDto> getAllPosts() {
+        List<PostResponseDto> postDtos = new ArrayList<>();
+        List<Post> posts = postRepository.findAll();
+        for (Post post : posts) {
+            postDtos.add(PostResponseDto.from(post, userService.postLikedByUser(post.getId())));
+        }
+        return postDtos;
     }
 
     public List<ReportDto> getAllReports() {
         return reportService.getAllReports();
+    }
+
+    public void toggleVisible(Long id) {
+        postService.toggleVisible(id);
     }
 
     public void banUser(Long userid) {
