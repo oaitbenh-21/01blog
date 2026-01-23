@@ -1,7 +1,6 @@
 package blog.Services;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import blog.Dto.CommentDto;
@@ -61,20 +60,14 @@ public class PostService {
         return post;
     }
 
-    public List<Post> getAllPosts(int page, int size) {
-        List<Post> posts = new ArrayList<>(
-                postRepository.findByIsDeletedFalse(PageRequest.of(page, size)).getContent());
+    public List<Post> getAllPosts() {
+        List<Post> posts = new ArrayList<>(postRepository.findByVisibleTrueOrderByCreatedAtDesc());
         return posts;
     }
 
-    public List<Post> getByFollowedUsers(int page, int size) {
+    public List<Post> getByFollowedUsers() {
         User currentUser = userService.getCurrentUser();
-        List<User> followedUsers = currentUser.getFollowing().stream()
-                .map(sub -> sub.getFollowing())
-                .toList();
-
-        List<Post> posts = new ArrayList<>(
-                postRepository.findByUserInAndIsDeletedFalse(followedUsers, PageRequest.of(page, size)).getContent());
+        List<Post> posts = postRepository.findSubscriptionsPosts(currentUser);
         return posts;
     }
 
@@ -99,10 +92,19 @@ public class PostService {
 
     public void deletePost(Long id) {
         Post post = getPostById(id);
-        post.setDeleted(true);
         if (userService.getCurrentUser().getId() != post.getUser().getId()
                 && userService.getCurrentUser().getRole() != Role.ADMIN) {
             throw new RuntimeException("You are not allowed to delete this post");
+        }
+        postRepository.delete(post);
+    }
+
+    public void toggleVisible(Long id) {
+        Post post = getPostById(id);
+        if (post.isVisible()) {
+            post.setVisible(false);
+        } else {
+            post.setVisible(true);
         }
         postRepository.save(post);
     }

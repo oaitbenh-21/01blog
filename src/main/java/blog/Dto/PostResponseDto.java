@@ -22,7 +22,7 @@ public class PostResponseDto {
     private String CDate;
     private String description;
     private List<String> fileUrl;
-    private Boolean isDeleted;
+    private Boolean visible;
 
     public static PostResponseDto from(Post post, boolean likedByCurrentUser) {
         User user = post.getUser();
@@ -37,7 +37,7 @@ public class PostResponseDto {
         if (postComments == null) {
             return new PostResponseDto(post.getId(), post.getContent(), PostAuthor.from(user), post.getLikes().size(),
                     likedByCurrentUser, List.of(), post.getCreatedAt().toString(), post.getDescription(), files,
-                    post.isDeleted());
+                    post.isVisible());
         }
         List<CommentResponseDto> comments = postComments.stream()
                 .map(CommentResponseDto::from)
@@ -48,6 +48,6 @@ public class PostResponseDto {
         }
         return new PostResponseDto(post.getId(), post.getContent(), PostAuthor.from(user), likesCount,
                 likedByCurrentUser, comments, post.getCreatedAt().toString(), post.getDescription(), files,
-                post.isDeleted());
+                post.isVisible());
     }
 }

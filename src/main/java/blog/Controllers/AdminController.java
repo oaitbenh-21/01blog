@@ -5,9 +5,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import blog.Dto.AnalyticsDto;
+import blog.Dto.PostResponseDto;
 import blog.Dto.ReportDto;
 import blog.Dto.UserDto;
-import blog.Model.Post;
 import blog.Model.User;
 import blog.Services.AdminService;
 
@@ -31,8 +31,15 @@ public class AdminController {
     }
 
     @GetMapping("/posts")
-    public ResponseEntity<List<Post>> getAllPosts() {
-        return ResponseEntity.ok(adminService.getAllPosts());
+    public ResponseEntity<List<PostResponseDto>> getAllPosts() {
+        List<PostResponseDto> postDtos = adminService.getAllPosts();
+        return ResponseEntity.ok(postDtos);
+    }
+
+    @PostMapping("posts/{id}/visible")
+    public ResponseEntity<Void> ToggleVisiblePost(@PathVariable Long id) {
+        adminService.toggleVisible(id);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/reports")

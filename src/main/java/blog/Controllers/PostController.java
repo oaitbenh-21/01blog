@@ -32,14 +32,23 @@ public class PostController {
     }
 
     @GetMapping
-    public ResponseEntity<List<PostResponseDto>> getAllPosts(@RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        List<Post> posts = postService.getAllPosts(page, size);
+    public ResponseEntity<List<PostResponseDto>> getAllPosts() {
+        List<Post> posts = postService.getAllPosts();
         List<PostResponseDto> postDtos = new ArrayList<>();
         for (Post post : posts) {
             postDtos.add(PostResponseDto.from(post, userService.postLikedByUser(post.getId())));
         }
 
+        return ResponseEntity.ok(postDtos);
+    }
+
+    @GetMapping("/subscriptions")
+    public ResponseEntity<List<PostResponseDto>> getSubscriptionsPosts() {
+        List<Post> posts = postService.getByFollowedUsers();
+        List<PostResponseDto> postDtos = new ArrayList<>();
+        for (Post post : posts) {
+            postDtos.add(PostResponseDto.from(post, userService.postLikedByUser(post.getId())));
+        }
         return ResponseEntity.ok(postDtos);
     }
 

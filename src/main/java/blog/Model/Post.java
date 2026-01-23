@@ -24,7 +24,7 @@ public class Post {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
 
-    private boolean isDeleted = false;
+    private boolean visible = true;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
