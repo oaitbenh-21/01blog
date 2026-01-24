@@ -28,7 +28,9 @@ public class UserController {
         List<Post> posts = userService.getPostsByUserId(id);
         List<PostResponseDto> postDtos = new ArrayList<>();
         for (Post post : posts) {
-            postDtos.add(PostResponseDto.from(post, userService.postLikedByUser(post.getId())));
+            if (post.isVisible()) {
+                postDtos.add(PostResponseDto.from(post, userService.postLikedByUser(post.getId())));
+            }
         }
         return ResponseEntity.ok(UserProfile.from(userService.getUserById(id), postDtos, userService.checkFollow(id),
                 userService.getCurrentUser().getId() == id));
