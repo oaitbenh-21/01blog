@@ -56,7 +56,7 @@ public class PostService {
                 mediaService.saveBase64File(post, fileString, fileUrl);
             } catch (Exception e) {
                 postRepository.delete(post);
-                throw new RuntimeException("Failed to save media file");
+                throw new RuntimeException("Failed to save media file, there is an uncorrect data.");
             }
         }
         return post;

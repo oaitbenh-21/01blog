@@ -2,6 +2,7 @@ package blog.Model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.ToString;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -9,6 +10,7 @@ import java.util.List;
 @Entity
 @Table(name = "posts")
 @Data
+@ToString(exclude = { "user", "comments", "likes", "media" })
 public class Post {
 
     @Id
