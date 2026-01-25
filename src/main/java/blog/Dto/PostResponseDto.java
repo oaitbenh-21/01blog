@@ -29,6 +29,9 @@ public class PostResponseDto {
         List<Comment> postComments = post.getComments();
         List<String> files = new ArrayList<>();
         if (post.getMedia() != null) {
+            System.out.println();
+            System.out.println(post.getMedia());
+            System.out.println();
             for (var media : post.getMedia()) {
                 files.add(media.getUrl());
             }
