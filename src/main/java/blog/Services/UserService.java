@@ -12,6 +12,11 @@ import blog.Dto.UpdateUserDto;
 import blog.Model.Post;
 import blog.Model.Subscription;
 
+import java.io.ByteArrayInputStream;
+import java.net.URLConnection;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Base64;
 import java.util.List;
 
 @Service
@@ -42,21 +47,6 @@ public class UserService {
         return user.getPosts();
     }
 
-    public void updateProfile(UpdateUserDto updatedUser) {
-        User user = getCurrentUser();
-        if (userRepository.existsByEmail(updatedUser.getEmail())) {
-            throw new RuntimeException("Email already in use");
-        }
-        user.setEmail(updatedUser.getEmail());
-        if (userRepository.existsByUsername(updatedUser.getUsername())) {
-            throw new RuntimeException("Username already in use");
-        }
-        user.setUsername(updatedUser.getUsername());
-        user.setBio(updatedUser.getBio());
-        user.setAvatarUrl(updatedUser.getAvatar());
-        userRepository.save(user);
-    }
-
     public boolean checkFollow(Long id) {
         User current = getCurrentUser();
         User toFollow = getUserById(id);
@@ -84,4 +74,53 @@ public class UserService {
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
     }
+
+    public void updateProfile(UpdateUserDto updatedUser) {
+        User user = getCurrentUser();
+        if (!user.getEmail().equals(updatedUser.getEmail())) {
+            if (userRepository.existsByEmail(updatedUser.getEmail())) {
+                throw new RuntimeException("Email already in use");
+            }
+            user.setEmail(updatedUser.getEmail());
+        }
+        if (!user.getUsername().equals(updatedUser.getUsername())) {
+            if (userRepository.existsByUsername(updatedUser.getUsername())) {
+                throw new RuntimeException("Username already in use");
+            }
+            user.setUsername(updatedUser.getUsername());
+        }
+        if (user.getBio() != null && !user.getBio().equals(updatedUser.getBio())) {
+            user.setBio(updatedUser.getBio());
+        }
+        String avatarData = updatedUser.getAvatar();
+        if (avatarData != null && !avatarData.isEmpty()) {
+
+            String uploadDir = "src/main/resources/static/avatars/";
+            try {
+                if (user.getAvatarUrl() != null && !user.getAvatarUrl().isEmpty()) {
+                    Path oldFile = Path.of(uploadDir + user.getAvatarUrl());
+                    Files.deleteIfExists(oldFile);
+                }
+                String[] parts = avatarData.split(",");
+                if (parts.length != 2)
+                    throw new IllegalArgumentException("Invalid avatar data");
+                byte[] fileBytes = Base64.getDecoder().decode(parts[1]);
+                String mimeType = URLConnection.guessContentTypeFromStream(new ByteArrayInputStream(fileBytes));
+                if (mimeType == null || !mimeType.startsWith("image/")) {
+                    throw new IllegalArgumentException("Avatar must be an image");
+                }
+                String ext = mimeType.split("/")[1];
+                String fileName = "avatar_" + user.getId() + "_" + System.currentTimeMillis() + "." + ext;
+                Path filePath = Path.of(uploadDir + fileName);
+                Files.createDirectories(filePath.getParent());
+                Files.write(filePath, fileBytes);
+                user.setAvatarUrl("avatars/" + fileName);
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to save avatar: " + e.getMessage(), e);
+            }
+        }
+
+        userRepository.save(user);
+    }
+
 }
