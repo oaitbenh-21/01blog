@@ -53,8 +53,12 @@ public class PostService {
         for (String fileString : postDto.getFile()) {
             try {
                 String fileUrl = "media/" + System.currentTimeMillis() + UUID.randomUUID().toString();
+                System.out.println();
+                System.out.println(fileString.substring(0, 30));
+                System.out.println();
                 mediaService.saveBase64File(post, fileString, fileUrl);
             } catch (Exception e) {
+                System.out.println(e.getMessage());
                 postRepository.delete(post);
                 throw new RuntimeException("Failed to save media file, there is an uncorrect data.");
             }
