@@ -40,7 +40,7 @@ public class MediaService {
         if (fileType == null)
             throw new IllegalArgumentException("Could not determine file type.");
 
-        String ext = ".mp4"; // default for videos
+        String ext = ".mp4";
         MediaType mediaType;
 
         switch (fileType) {
@@ -51,11 +51,7 @@ public class MediaService {
             case "video/mp4" -> mediaType = MediaType.VIDEO;
             default -> throw new IllegalArgumentException("Unsupported file type: " + fileType);
         }
-
-        // save DB record
         saveMedia(post, outputPath + ext, mediaType);
-
-        // save file to disk
         try (FileOutputStream fos = new FileOutputStream(new File(uploadDir + outputPath + ext))) {
             fos.write(fileBytes);
         }
@@ -158,14 +154,12 @@ public class MediaService {
     public void removeImage(Long mediaId) {
         Media media = mediaRepository.findById(mediaId)
                 .orElseThrow(() -> new IllegalArgumentException("Media not found"));
-        // delete file from disk
         Path filePath = Paths.get(uploadDir + media.getUrl());
         try {
             Files.deleteIfExists(filePath);
         } catch (IOException e) {
             throw new RuntimeException("Failed to delete file", e);
         }
-        // delete DB record
         mediaRepository.delete(media);
     }
 
