@@ -89,7 +89,7 @@ public class UserService {
             }
             user.setUsername(updatedUser.getUsername());
         }
-        if (user.getBio() != null && !user.getBio().equals(updatedUser.getBio())) {
+        if (updatedUser.getBio() != null) {
             user.setBio(updatedUser.getBio());
         }
         String avatarData = updatedUser.getAvatar();
