@@ -10,8 +10,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import blog.Model.Notification;
+import blog.Dto.NotificationDto;
 import blog.Services.NotificationService;
+import blog.Services.UserService;
 
 @RestController
 @RequestMapping("/notifications")
@@ -19,10 +20,12 @@ public class NotificationController {
 
     @Autowired
     private NotificationService notificationService;
+    @Autowired
+    private UserService userService;
 
     @GetMapping
-    public ResponseEntity<List<Notification>> getNotifications() {
-        return ResponseEntity.ok(notificationService.getNotifications());
+    public ResponseEntity<List<NotificationDto>> getNotifications() {
+        return ResponseEntity.ok(notificationService.getNotificationDtos(userService.getCurrentUser()));
     }
 
     @PostMapping("/{id}/read")
@@ -45,7 +48,7 @@ public class NotificationController {
 
     @PostMapping("/markAllRead")
     public ResponseEntity<Void> markAllAsRead() {
-        notificationService.markAllAsRead();
+        notificationService.markAllAsRead(userService.getCurrentUser());
         return ResponseEntity.ok().build();
     }
 }

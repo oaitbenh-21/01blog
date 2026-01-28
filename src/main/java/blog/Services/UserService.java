@@ -5,6 +5,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import blog.Model.User;
+import blog.Model.enums.NotificationType;
 import blog.Repositories.LikeRepository;
 import blog.Repositories.SubscriptionRepository;
 import blog.Repositories.UserRepository;
@@ -28,6 +29,8 @@ public class UserService {
     private LikeRepository likeRepository;
     @Autowired
     private SubscriptionRepository subscriptionRepository;
+    @Autowired
+    private NotificationService notificationService;
 
     public boolean postLikedByUser(Long postId) {
         return likeRepository.existsByPostIdAndUserId(postId, getCurrentUser().getId());
@@ -61,6 +64,8 @@ public class UserService {
         User toFollow = getUserById(id);
         if (subscriptionRepository.existsByFollowerAndFollowing(current, toFollow))
             throw new RuntimeException("Already subscribed");
+        notificationService.createNotification(toFollow, NotificationType.NEW_POST,
+                current.getUsername() + " followed you");
         subscriptionRepository.save(new Subscription(null, current, toFollow, null));
     }
 
