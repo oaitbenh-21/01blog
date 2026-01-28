@@ -1,5 +1,9 @@
 package blog.Services;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -9,15 +13,14 @@ import blog.Dto.PostDto;
 import blog.Model.Comment;
 import blog.Model.Like;
 import blog.Model.Post;
+import blog.Model.Subscription;
 import blog.Model.User;
+import blog.Model.enums.NotificationType;
 import blog.Model.enums.Role;
 import blog.Repositories.CommentRepository;
 import blog.Repositories.LikeRepository;
 import blog.Repositories.PostRepository;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import blog.Repositories.SubscriptionRepository;
 
 @Service
 public class PostService {
@@ -30,6 +33,11 @@ public class PostService {
 
     @Autowired
     private CommentRepository commentRepository;
+
+    @Autowired
+    private SubscriptionRepository subscriptionRepository;
+    @Autowired
+    private NotificationService notificationService;
 
     @Autowired
     private LikeRepository likeRepository;
@@ -53,15 +61,24 @@ public class PostService {
         for (String fileString : postDto.getFile()) {
             try {
                 String fileUrl = "media/" + System.currentTimeMillis() + UUID.randomUUID().toString();
-                System.out.println();
-                System.out.println(fileString.substring(0, 30));
-                System.out.println();
                 mediaService.saveBase64File(post, fileString, fileUrl);
             } catch (Exception e) {
-                System.out.println(e.getMessage());
                 postRepository.delete(post);
                 throw new RuntimeException("Failed to save media file, there is an uncorrect data.");
             }
+        }
+        List<User> followers = subscriptionRepository.findByFollowingId(user.getId())
+                .stream()
+                .map(Subscription::getFollower)
+                .toList();
+
+        System.out.println(followers.size());
+
+        for (User usr : followers) {
+            notificationService.createNotification(
+                    usr,
+                    NotificationType.NEW_POST,
+                    user.getUsername() + " made a new post");
         }
         return post;
     }
@@ -127,6 +144,8 @@ public class PostService {
             like.setPost(post);
             like.setUser(user);
             likeRepository.save(like);
+            notificationService.createNotification(post.getUser(), NotificationType.LIKE,
+                    user.getUsername() + " liked your post");
         }
     }
 
@@ -139,6 +158,8 @@ public class PostService {
         comment.setContent(commentDto.getContent());
         comment = commentRepository.save(comment);
         CommentResponseDto res = CommentResponseDto.from(comment);
+        notificationService.createNotification(post.getUser(), NotificationType.COMMENT,
+                user.getUsername() + " commented on your post");
         return res;
     }
 

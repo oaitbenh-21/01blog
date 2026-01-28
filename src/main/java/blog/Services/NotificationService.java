@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import blog.Dto.NotificationDto;
 import blog.Model.Notification;
 import blog.Model.User;
 import blog.Model.enums.NotificationType;
@@ -16,10 +17,7 @@ public class NotificationService {
     @Autowired
     private NotificationRepository notificationRepository;
 
-    @Autowired
-    private UserService userService;
-
-    public void createNotification(User user ,NotificationType type, String message) {
+    public void createNotification(User user, NotificationType type, String message) {
         Notification notification = new Notification();
         notification.setUser(user);
         notification.setType(type);
@@ -27,8 +25,15 @@ public class NotificationService {
         notificationRepository.save(notification);
     }
 
-    public List<Notification> getNotifications() {
-        return notificationRepository.findByUserOrderByCreatedAtDesc(userService.getCurrentUser());
+    public List<Notification> getNotifications(User user) {
+        return notificationRepository.findByUserOrderByCreatedAtDesc(user);
+    }
+
+    public List<NotificationDto> getNotificationDtos(User user) {
+        List<NotificationDto> notDtos = notificationRepository
+                .findByUserOrderByCreatedAtDesc(user).stream().map(NotificationDto::from)
+                .toList();
+        return notDtos;
     }
 
     public void markAsRead(Long id) {
@@ -38,8 +43,8 @@ public class NotificationService {
         notificationRepository.save(notification);
     }
 
-    public void markAllAsRead() {
-        List<Notification> notifications = getNotifications();
+    public void markAllAsRead(User user) {
+        List<Notification> notifications = getNotifications(user);
         notifications.forEach(n -> n.setRead(true));
         notificationRepository.saveAll(notifications);
     }
