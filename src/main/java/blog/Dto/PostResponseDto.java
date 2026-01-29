@@ -23,8 +23,9 @@ public class PostResponseDto {
     private String description;
     private List<String> fileUrl;
     private Boolean visible;
+    private Boolean mine;
 
-    public static PostResponseDto from(Post post, boolean likedByCurrentUser) {
+    public static PostResponseDto from(Post post, boolean likedByCurrentUser, User currentUser) {
         User user = post.getUser();
         List<Comment> postComments = post.getComments();
         List<String> files = new ArrayList<>();
@@ -40,7 +41,7 @@ public class PostResponseDto {
         if (postComments == null) {
             return new PostResponseDto(post.getId(), post.getContent(), PostAuthor.from(user), post.getLikes().size(),
                     likedByCurrentUser, List.of(), post.getCreatedAt().toString(), post.getDescription(), files,
-                    post.isVisible());
+                    post.isVisible(), currentUser.getId().equals(user.getId()));
         }
         List<CommentResponseDto> comments = postComments.stream()
                 .map(CommentResponseDto::from)
@@ -51,6 +52,6 @@ public class PostResponseDto {
         }
         return new PostResponseDto(post.getId(), post.getContent(), PostAuthor.from(user), likesCount,
                 likedByCurrentUser, comments, post.getCreatedAt().toString(), post.getDescription(), files,
-                post.isVisible());
+                post.isVisible(), currentUser.getId().equals(user.getId()));
     }
 }

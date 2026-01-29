@@ -28,7 +28,8 @@ public class PostController {
     @PostMapping
     public ResponseEntity<PostResponseDto> createPost(@RequestBody @Valid PostDto postDto) {
         Post createdPost = postService.createPost(postDto);
-        return ResponseEntity.ok(PostResponseDto.from(createdPost, userService.postLikedByUser(createdPost.getId())));
+        return ResponseEntity.ok(PostResponseDto.from(createdPost, userService.postLikedByUser(createdPost.getId()),
+                userService.getCurrentUser()));
     }
 
     @GetMapping
@@ -36,7 +37,9 @@ public class PostController {
         List<Post> posts = postService.getAllPosts();
         List<PostResponseDto> postDtos = new ArrayList<>();
         for (Post post : posts) {
-            postDtos.add(PostResponseDto.from(post, userService.postLikedByUser(post.getId())));
+            postDtos.add(PostResponseDto.from(post,
+                    userService.postLikedByUser(post.getId()),
+                    userService.getCurrentUser()));
         }
 
         return ResponseEntity.ok(postDtos);
@@ -47,7 +50,8 @@ public class PostController {
         List<Post> posts = postService.getByFollowedUsers();
         List<PostResponseDto> postDtos = new ArrayList<>();
         for (Post post : posts) {
-            postDtos.add(PostResponseDto.from(post, userService.postLikedByUser(post.getId())));
+            postDtos.add(PostResponseDto.from(post, userService.postLikedByUser(post.getId()),
+                    userService.getCurrentUser()));
         }
         return ResponseEntity.ok(postDtos);
     }
@@ -55,14 +59,16 @@ public class PostController {
     @GetMapping("/{id}")
     public ResponseEntity<PostResponseDto> getPostById(@PathVariable Long id) {
         Post post = postService.getPostById(id);
-        return ResponseEntity.ok(PostResponseDto.from(post, userService.postLikedByUser(post.getId())));
+        return ResponseEntity.ok(
+                PostResponseDto.from(post, userService.postLikedByUser(post.getId()), userService.getCurrentUser()));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<PostResponseDto> updatePost(@PathVariable Long id,
             @RequestPart("post") PostDto postDto) {
         Post updatedPost = postService.updatePost(id, postDto);
-        return ResponseEntity.ok(PostResponseDto.from(updatedPost, userService.postLikedByUser(updatedPost.getId())));
+        return ResponseEntity.ok(PostResponseDto.from(updatedPost, userService.postLikedByUser(updatedPost.getId()),
+                userService.getCurrentUser()));
     }
 
     @DeleteMapping("/{id}")

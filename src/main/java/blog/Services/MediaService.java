@@ -114,8 +114,6 @@ public class MediaService {
         if (mimeType == null || mimeType.isBlank()) {
             throw new IllegalArgumentException("Could not determine file type.");
         }
-        System.out.println();
-        System.out.println(mimeType);
         return mimeType;
     }
 
