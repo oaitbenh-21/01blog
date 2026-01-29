@@ -48,7 +48,8 @@ public class AdminService {
         List<PostResponseDto> postDtos = new ArrayList<>();
         List<Post> posts = postRepository.findAll();
         for (Post post : posts) {
-            postDtos.add(PostResponseDto.from(post, userService.postLikedByUser(post.getId())));
+            postDtos.add(PostResponseDto.from(post, userService.postLikedByUser(post.getId()),
+                    userService.getCurrentUser()));
         }
         return postDtos;
     }

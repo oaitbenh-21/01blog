@@ -55,24 +55,23 @@ public class PostService {
         List<Comment> comments = List.of();
         post.setComments(comments);
         post = postRepository.save(post);
-        if (postDto.getFile() == null || postDto.getFile().isEmpty()) {
-            return post;
-        }
-        for (String fileString : postDto.getFile()) {
-            try {
-                String fileUrl = "media/" + System.currentTimeMillis() + UUID.randomUUID().toString();
-                mediaService.saveBase64File(post, fileString, fileUrl);
-            } catch (Exception e) {
-                postRepository.delete(post);
-                throw new RuntimeException("Failed to save media file, there is an uncorrect data.");
+
+        if (postDto.getFile() != null && !postDto.getFile().isEmpty()) {
+            for (String fileString : postDto.getFile()) {
+                try {
+                    String fileUrl = "media/" + System.currentTimeMillis() + UUID.randomUUID().toString();
+                    mediaService.saveBase64File(post, fileString, fileUrl);
+                } catch (Exception e) {
+                    postRepository.delete(post);
+                    throw new RuntimeException("Failed to save media file, there is an uncorrect data.");
+                }
             }
         }
+
         List<User> followers = subscriptionRepository.findByFollowingId(user.getId())
                 .stream()
                 .map(Subscription::getFollower)
                 .toList();
-
-        System.out.println(followers.size());
 
         for (User usr : followers) {
             notificationService.createNotification(
@@ -80,6 +79,7 @@ public class PostService {
                     NotificationType.NEW_POST,
                     user.getUsername() + " made a new post");
         }
+
         return post;
     }
 
