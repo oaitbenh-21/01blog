@@ -9,8 +9,9 @@ import lombok.Data;
 public class CommentResponseDto {
     private String content;
     private PostAuthor author;
+    private boolean mine;
 
-    public static CommentResponseDto from(Comment comment) {
-        return new CommentResponseDto(comment.getContent(), PostAuthor.from(comment.getUser()));
+    public static CommentResponseDto from(Comment comment, boolean mine) {
+        return new CommentResponseDto(comment.getContent(), PostAuthor.from(comment.getUser()), mine);
     }
 }
