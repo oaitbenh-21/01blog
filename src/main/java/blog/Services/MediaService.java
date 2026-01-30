@@ -32,6 +32,7 @@ public class MediaService {
 
         if (diskFile.exists()) {
             boolean deleted = diskFile.delete();
+            mediaRepository.delete(file);
             if (!deleted) {
                 System.out.println("Failed to delete file: " + url);
             }
