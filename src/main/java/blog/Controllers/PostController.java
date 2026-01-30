@@ -65,7 +65,7 @@ public class PostController {
 
     @PutMapping("/{id}")
     public ResponseEntity<PostResponseDto> updatePost(@PathVariable Long id,
-            @RequestPart("post") PostDto postDto) {
+            @RequestBody PostDto postDto) {
         Post updatedPost = postService.updatePost(id, postDto);
         return ResponseEntity.ok(PostResponseDto.from(updatedPost, userService.postLikedByUser(updatedPost.getId()),
                 userService.getCurrentUser()));

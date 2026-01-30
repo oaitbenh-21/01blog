@@ -56,8 +56,8 @@ public class PostService {
         post.setComments(comments);
         post = postRepository.save(post);
 
-        if (postDto.getFile() != null && !postDto.getFile().isEmpty()) {
-            for (String fileString : postDto.getFile()) {
+        if (postDto.getFiles() != null && !postDto.getFiles().isEmpty()) {
+            for (String fileString : postDto.getFiles()) {
                 try {
                     String fileUrl = "media/" + System.currentTimeMillis() + UUID.randomUUID().toString();
                     mediaService.saveBase64File(post, fileString, fileUrl);
@@ -109,6 +109,18 @@ public class PostService {
         }
         post.setContent(postDto.getContent());
         post.setDescription(postDto.getDescription());
+        post.getMedia().forEach(file -> mediaService.delete(file));
+
+        if (postDto.getFiles() != null && !postDto.getFiles().isEmpty()) {
+            for (String fileString : postDto.getFiles()) {
+                try {
+                    String fileUrl = "media/" + System.currentTimeMillis() + UUID.randomUUID().toString();
+                    mediaService.saveBase64File(post, fileString, fileUrl);
+                } catch (Exception e) {
+                    throw new RuntimeException("Failed to save media file, post didn't updated.");
+                }
+            }
+        }
         Post updated = postRepository.save(post);
         return updated;
     }
@@ -144,8 +156,10 @@ public class PostService {
             like.setPost(post);
             like.setUser(user);
             likeRepository.save(like);
-            notificationService.createNotification(post.getUser(), NotificationType.LIKE,
-                    user.getUsername() + " liked your post");
+            if (!user.getId().equals(post.getUser().getId())) {
+                notificationService.createNotification(post.getUser(), NotificationType.LIKE,
+                        user.getUsername() + " liked your post");
+            }
         }
     }
 
@@ -157,9 +171,12 @@ public class PostService {
         comment.setUser(user);
         comment.setContent(commentDto.getContent());
         comment = commentRepository.save(comment);
-        CommentResponseDto res = CommentResponseDto.from(comment);
-        notificationService.createNotification(post.getUser(), NotificationType.COMMENT,
-                user.getUsername() + " commented on your post");
+        CommentResponseDto res = CommentResponseDto.from(comment,
+                user.getId().equals(comment.getUser().getId()));
+        if (!user.getId().equals(post.getUser().getId())) {
+            notificationService.createNotification(post.getUser(), NotificationType.COMMENT,
+                    user.getUsername() + " commented on your post");
+        }
         return res;
     }
 

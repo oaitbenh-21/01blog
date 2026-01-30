@@ -17,6 +17,6 @@ public class PostDto {
     @Size(min = 10, max = 5_000_000, message = "Content should be from 10 to 5000 characters")
     private String content;
 
-    @Size(max = 10_000_000, message = "File is too large")
-    private List<String> file;
+    @Size(max = 10_000_000, message = "Files is too large")
+    private List<String> files;
 }

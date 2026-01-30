@@ -25,6 +25,8 @@ public class PostResponseDto {
     private Boolean visible;
     private Boolean mine;
 
+    private static final String SERVER_URL = "http://localhost:8080/";
+
     public static PostResponseDto from(Post post, boolean likedByCurrentUser, User currentUser) {
         User user = post.getUser();
         List<Comment> postComments = post.getComments();
@@ -34,7 +36,7 @@ public class PostResponseDto {
             System.out.println(post.getMedia());
             System.out.println();
             for (var media : post.getMedia()) {
-                files.add(media.getUrl());
+                files.add(SERVER_URL + media.getUrl());
             }
         }
 
@@ -44,7 +46,9 @@ public class PostResponseDto {
                     post.isVisible(), currentUser.getId().equals(user.getId()));
         }
         List<CommentResponseDto> comments = postComments.stream()
-                .map(CommentResponseDto::from)
+                .map((Comment comment) -> {
+                    return CommentResponseDto.from(comment, comment.getUser().getId().equals(currentUser.getId()));
+                })
                 .collect(Collectors.toList());
         int likesCount = 0;
         if (post.getLikes() != null) {

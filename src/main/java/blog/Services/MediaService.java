@@ -10,6 +10,7 @@ import org.apache.tika.Tika;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -24,6 +25,18 @@ public class MediaService {
     private final MediaRepository mediaRepository;
     private final String uploadDir = "src/main/resources/static/";
     private final Tika tika = new Tika();
+
+    public void delete(Media file) {
+        String url = file.getUrl();
+        File diskFile = new File(uploadDir + url);
+
+        if (diskFile.exists()) {
+            boolean deleted = diskFile.delete();
+            if (!deleted) {
+                System.out.println("Failed to delete file: " + url);
+            }
+        }
+    }
 
     public Media saveBase64File(String dataUrl) throws Exception {
         byte[] fileBytes = decodeBase64(dataUrl);
