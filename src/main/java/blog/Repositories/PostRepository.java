@@ -15,9 +15,14 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     List<Post> findByVisibleTrueOrderByCreatedAtDesc();
 
-    @Query("SELECT p FROM Post p WHERE p.visible = false AND p.user IN " +
-            "(SELECT s.following FROM Subscription s WHERE s.follower = :user) " +
-            "ORDER BY p.createdAt DESC")
+    @Query("""
+            SELECT p FROM Post p
+            WHERE p.visible = true
+              AND p.user IN (
+                  SELECT s.following FROM Subscription s WHERE s.follower = :user
+              )
+            ORDER BY p.createdAt DESC
+            """)
     List<Post> findSubscriptionsPosts(@Param("user") User user);
 
 }
