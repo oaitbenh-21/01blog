@@ -1,156 +1,153 @@
 package blog.Services;
 
+import blog.Dto.CommentDto;
+import blog.Dto.CommentResponseDto;
+import blog.Dto.PostDto;
+import blog.Model.*;
+import blog.Model.enums.NotificationType;
+import blog.Model.enums.Role;
+import blog.Repositories.*;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import blog.Dto.CommentDto;
-import blog.Dto.CommentResponseDto;
-import blog.Dto.PostDto;
-import blog.Model.Comment;
-import blog.Model.Like;
-import blog.Model.Post;
-import blog.Model.Subscription;
-import blog.Model.User;
-import blog.Model.enums.NotificationType;
-import blog.Model.enums.Role;
-import blog.Repositories.CommentRepository;
-import blog.Repositories.LikeRepository;
-import blog.Repositories.PostRepository;
-import blog.Repositories.SubscriptionRepository;
-
 @Service
+@RequiredArgsConstructor
 public class PostService {
 
-    @Autowired
-    private PostRepository postRepository;
+    private final PostRepository postRepository;
+    private final UserService userService;
+    private final CommentRepository commentRepository;
+    private final SubscriptionRepository subscriptionRepository;
+    private final NotificationService notificationService;
+    private final LikeRepository likeRepository;
+    private final MediaService mediaService;
 
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private CommentRepository commentRepository;
-
-    @Autowired
-    private SubscriptionRepository subscriptionRepository;
-    @Autowired
-    private NotificationService notificationService;
-
-    @Autowired
-    private LikeRepository likeRepository;
-    @Autowired
-    private MediaService mediaService;
-
+    // --- Create a new post ---
+    @Transactional
     public Post createPost(PostDto postDto) {
         User user = userService.getCurrentUser();
         Post post = new Post();
         post.setUser(user);
         post.setContent(postDto.getContent());
         post.setDescription(postDto.getDescription());
-        List<Like> likes = List.of();
-        post.setLikes(likes);
-        List<Comment> comments = List.of();
-        post.setComments(comments);
+        post.setLikes(new ArrayList<>());
+        post.setComments(new ArrayList<>());
+        post.setMedia(new ArrayList<>());
         post = postRepository.save(post);
 
+        // Save media
         if (postDto.getFiles() != null && !postDto.getFiles().isEmpty()) {
             for (String fileString : postDto.getFiles()) {
                 try {
-                    String fileUrl = "media/" + System.currentTimeMillis() + UUID.randomUUID().toString();
+                    String fileUrl = "media/" + System.currentTimeMillis() + UUID.randomUUID();
                     mediaService.saveBase64File(post, fileString, fileUrl);
                 } catch (Exception e) {
                     postRepository.delete(post);
-                    throw new RuntimeException("Failed to save media file, there is an uncorrect data.");
+                    throw new RuntimeException("Failed to save media file. Invalid data.", e);
                 }
             }
         }
 
+        // Notify followers
         List<User> followers = subscriptionRepository.findByFollowingId(user.getId())
-                .stream()
-                .map(Subscription::getFollower)
-                .toList();
-
+                .stream().map(Subscription::getFollower).toList();
         for (User usr : followers) {
-            notificationService.createNotification(
-                    usr,
-                    NotificationType.NEW_POST,
+            notificationService.createNotification(usr, NotificationType.NEW_POST,
                     user.getUsername() + " made a new post");
         }
 
         return post;
     }
 
+    // --- Get all posts ---
     public List<Post> getAllPosts() {
-        List<Post> posts = new ArrayList<>(postRepository.findByVisibleTrueOrderByCreatedAtDesc());
-        return posts;
+        return new ArrayList<>(postRepository.findByVisibleTrueOrderByCreatedAtDesc());
     }
 
+    // --- Get posts from followed users ---
     public List<Post> getByFollowedUsers() {
         User currentUser = userService.getCurrentUser();
-        List<Post> posts = postRepository.findSubscriptionsPosts(currentUser);
-        return posts;
+        return postRepository.findSubscriptionsPosts(currentUser);
     }
 
+    // --- Get post by ID ---
     public Post getPostById(Long id) {
-        System.out.println(id);
-        return postRepository.findById(id).orElseThrow(() -> new RuntimeException("Post not found"));
+        return postRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Post not found"));
     }
 
+    // --- Update post content and media ---
+    @Transactional
     public Post updatePost(Long id, PostDto postDto) {
-        if (postDto.getContent() == null || postDto.getContent().isBlank()) {
-            throw new RuntimeException("Post content cannot be empty");
-        }
         Post post = getPostById(id);
-        if (userService.getCurrentUser().getId() != post.getUser().getId()) {
-            throw new RuntimeException("Unauthorized");
+
+        if (!userService.getCurrentUser().getId().equals(post.getUser().getId())) {
+            throw new SecurityException("Unauthorized: Cannot edit this post");
         }
+
+        // Update text
         post.setContent(postDto.getContent());
         post.setDescription(postDto.getDescription());
-        post.getMedia().forEach(file -> mediaService.delete(file));
 
+        // Delete old media
+        if (post.getMedia() != null && !post.getMedia().isEmpty()) {
+            post.getMedia().forEach(media -> mediaService.deleteFile(media.getUrl()));
+            post.getMedia().clear(); // orphanRemoval deletes from DB
+        }
+
+        // Save new media
         if (postDto.getFiles() != null && !postDto.getFiles().isEmpty()) {
             for (String fileString : postDto.getFiles()) {
                 try {
-                    String fileUrl = "media/" + System.currentTimeMillis() + UUID.randomUUID().toString();
+                    String fileUrl = "media/" + System.currentTimeMillis() + UUID.randomUUID();
                     mediaService.saveBase64File(post, fileString, fileUrl);
                 } catch (Exception e) {
-                    throw new RuntimeException("Failed to save media file, post didn't updated.");
+                    throw new RuntimeException("Failed to save media file. Post update aborted.", e);
                 }
             }
         }
-        Post updated = postRepository.save(post);
-        return updated;
+
+        return postRepository.save(post);
     }
 
+    // --- Delete a post ---
+    @Transactional
     public void deletePost(Long id) {
         Post post = getPostById(id);
-        if (userService.getCurrentUser().getId() != post.getUser().getId()
-                && userService.getCurrentUser().getRole() != Role.ADMIN) {
+        User currentUser = userService.getCurrentUser();
+        if (!currentUser.getId().equals(post.getUser().getId()) && currentUser.getRole() != Role.ADMIN) {
             throw new RuntimeException("You are not allowed to delete this post");
         }
-        postRepository.delete(post);
+
+        // Delete media files
+        if (post.getMedia() != null && !post.getMedia().isEmpty()) {
+            post.getMedia().forEach(media -> mediaService.deleteFile(media.getUrl()));
+        }
+
+        postRepository.delete(post); // orphanRemoval ensures DB deletion
     }
 
+    // --- Toggle visibility ---
+    @Transactional
     public void toggleVisible(Long id) {
         Post post = getPostById(id);
-        if (post.isVisible()) {
-            post.setVisible(false);
-        } else {
-            post.setVisible(true);
-        }
+        post.setVisible(!post.isVisible());
         postRepository.save(post);
     }
 
+    // --- Toggle like ---
+    @Transactional
     public void toggleLike(Long postId) {
         Post post = getPostById(postId);
         User user = userService.getCurrentUser();
         if (likeRepository.existsByPostIdAndUserId(postId, user.getId())) {
-            Like like = likeRepository.findByPostAndUser(post, user)
-                    .orElseThrow(() -> new RuntimeException("Like not found"));
-            likeRepository.delete(like);
+            likeRepository.findByPostAndUser(post, user)
+                    .ifPresent(likeRepository::delete);
         } else {
             Like like = new Like();
             like.setPost(post);
@@ -163,6 +160,8 @@ public class PostService {
         }
     }
 
+    // --- Add comment ---
+    @Transactional
     public CommentResponseDto addComment(Long postId, CommentDto commentDto) {
         Post post = getPostById(postId);
         User user = userService.getCurrentUser();
@@ -171,18 +170,22 @@ public class PostService {
         comment.setUser(user);
         comment.setContent(commentDto.getContent());
         comment = commentRepository.save(comment);
+
         CommentResponseDto res = CommentResponseDto.from(comment,
                 user.getId().equals(comment.getUser().getId()));
+
         if (!user.getId().equals(post.getUser().getId())) {
             notificationService.createNotification(post.getUser(), NotificationType.COMMENT,
                     user.getUsername() + " commented on your post");
         }
+
         return res;
     }
 
+    // --- Delete comment ---
+    @Transactional
     public void deleteComment(Long postId, Long commentId) {
-        Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new RuntimeException("Comment not found"));
-        commentRepository.delete(comment);
+        commentRepository.findById(commentId)
+                .ifPresent(commentRepository::delete);
     }
 }
