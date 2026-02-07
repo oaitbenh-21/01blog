@@ -38,9 +38,9 @@ public class BlogApplication {
                 List<User> users = new ArrayList<>();
                 for (int i = 1; i <= 10; i++) {
                     User user = new User();
-                    user.setUsername("user" + i);
-                    user.setEmail("user" + i + "@example.com");
-                    user.setPassword(passwordEncoder.encode("password"));
+                    user.setUsername("bot__" + i);
+                    user.setEmail("bot_@" + i + "@example.com");
+                    user.setPassword(passwordEncoder.encode("bot__" + i));
                     user.setRole(Role.USER);
                     userRepository.save(user);
                     users.add(user);

@@ -31,6 +31,9 @@ public class PostService {
     @Transactional
     public Post createPost(PostDto postDto) {
         User user = userService.getCurrentUser();
+        if (user.isBanned()) {
+            throw new RuntimeException("Your account is banned");
+        }
         Post post = new Post();
         post.setUser(user);
         post.setContent(postDto.getContent());
@@ -85,8 +88,11 @@ public class PostService {
     @Transactional
     public Post updatePost(Long id, PostDto postDto) {
         Post post = getPostById(id);
-
-        if (!userService.getCurrentUser().getId().equals(post.getUser().getId())) {
+        User user = userService.getCurrentUser();
+        if (user.isBanned()) {
+            throw new RuntimeException("Your account is banned");
+        }
+        if (!user.getId().equals(post.getUser().getId())) {
             throw new SecurityException("Unauthorized: Cannot edit this post");
         }
 
@@ -165,6 +171,9 @@ public class PostService {
     public CommentResponseDto addComment(Long postId, CommentDto commentDto) {
         Post post = getPostById(postId);
         User user = userService.getCurrentUser();
+        if (user.isBanned()) {
+            throw new RuntimeException("Your account is banned");
+        }
         Comment comment = new Comment();
         comment.setPost(post);
         comment.setUser(user);
