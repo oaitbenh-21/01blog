@@ -99,6 +99,9 @@ public class UserService {
         }
         String avatarData = updatedUser.getAvatar();
         if (avatarData != null && !avatarData.isEmpty()) {
+            if (avatarData.length() > 2_000_000) {
+                throw new RuntimeException("Avatar size exceeds the maximum allowed limit of 10MB");
+            }
 
             String uploadDir = "src/main/resources/static/avatars/";
             try {

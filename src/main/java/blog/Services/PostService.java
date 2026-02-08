@@ -46,6 +46,11 @@ public class PostService {
         // Save media
         if (postDto.getFiles() != null && !postDto.getFiles().isEmpty()) {
             for (String fileString : postDto.getFiles()) {
+                if (fileString == null || fileString.isBlank()) {
+                    continue;
+                } else if (fileString.length() > 10_000_000) {
+                    throw new RuntimeException("file size exceeds the maximum allowed limit of 10MB");
+                }
                 try {
                     String fileUrl = "media/" + System.currentTimeMillis() + UUID.randomUUID();
                     mediaService.saveBase64File(post, fileString, fileUrl);
@@ -56,7 +61,7 @@ public class PostService {
             }
         }
 
-        // Notify followers
+        // notify followers
         List<User> followers = subscriptionRepository.findByFollowingId(user.getId())
                 .stream().map(Subscription::getFollower).toList();
         for (User usr : followers) {
